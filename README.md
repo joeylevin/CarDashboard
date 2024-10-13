@@ -14,6 +14,8 @@ git config --global user.email levinjoey@gmail.com
 git config --global user.name Joey
 
 Sentiment Analyzer Deploy
+Start Cloud code engine project
+open Cloud Engine CLI
 cd server/djangoapp/microservices
 docker build . -t us.icr.io/${SN_ICR_NAMESPACE}/senti_analyzer
 docker push us.icr.io/${SN_ICR_NAMESPACE}/senti_analyzer
