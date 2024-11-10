@@ -29,3 +29,19 @@ docker push us.icr.io/$MY_NAMESPACE/dealership
 
 create deployment
 kubectl apply -f deployment.yaml
+
+Common issues
+no such table: djangoapp_carmake
+to fix: 
+rm server/djangoapp/__init__.py server/db.sqlite3   
+rm -r server/djangoapp/__pycache__
+apply migrations from runServer.txt
+python3 manage.py makemigrations
+python3 manage.py migrate --run-syncdb
+
+To initialize car list: 
+go to : /djangoapp/get_cars
+
+
+Update links in server/djangoapp/.env
+and server/djangoproj/settings.py for ALLOWED_HOSTS and CSRF_TRUSTED_ORIGINS
