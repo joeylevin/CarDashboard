@@ -118,7 +118,7 @@ def get_dealer_reviews(request, dealer_id):
             response = analyze_review_sentiments(review_detail['review'])
             print(response)
             if response is not None:
-                review_detail['sentiment'] = response['sentiment'] 
+                review_detail['sentiment'] = response['sentiment']
             else:
                 review_detail['sentiment'] = ""
         return JsonResponse({"status": 200, "reviews": reviews})
