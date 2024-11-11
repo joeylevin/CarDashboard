@@ -1,5 +1,5 @@
 cd server
-pip install virtualenv
+pip3 install virtualenv
 virtualenv djangoenv
 source djangoenv/bin/activate
 

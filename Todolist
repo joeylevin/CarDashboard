@@ -1,0 +1,9 @@
+When filter by make, update the models list
+Add page for each car with more information
+add chat bot
+add dealer view
+    login option to select which dealer you are
+    as a dealer, when you go to that page can add/edit cars
+Add admin view
+    can add/edit dealerships
+    and can add/edit cars from all dealerships
