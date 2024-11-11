@@ -9,6 +9,8 @@ cd server/database
 docker build . -t nodeapp
 docker-compose up
 
+Also run in server/carsInventory
+
 Git
 git config --global user.email levinjoey@gmail.com
 git config --global user.name Joey
