@@ -1,12 +1,18 @@
 /*jshint esversion: 8 */
+// dealership.js
+// This file defines a Mongoose schema and model for storing dealership information.
+// Each document represents a car dealership with details such as location, address, and name.
+// The schema facilitates efficient storage and retrieval of dealership data, which can be linked to other collections like car inventory.
+
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const dealerships = new Schema({
+const DealershipSchema = new Schema({
 	id: {
     type: Number,
     required: true,
+    unique: true
 	},
 	city: {
     type: String,
@@ -41,4 +47,4 @@ const dealerships = new Schema({
   }
 });
 
-module.exports = mongoose.model('dealerships', dealerships);
+module.exports = mongoose.model('dealerships', DealershipSchema);

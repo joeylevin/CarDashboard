@@ -1,12 +1,16 @@
-const { Int32 } = require('mongodb');
+// inventory.js
+// This file defines the Mongoose schema for the 'cars' collection in MongoDB.
+// Each car document includes details such as dealer ID, make, model, body type, year, mileage, and price.
+
 const mongoose = require('mongoose');
 
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
-const cars = new Schema({
+const CarSchema = new Schema({
     dealer_id: {
         type: Number,
-        required: true
+        required: true,
+        index: true
     },
     make: {
         type: String,
@@ -22,16 +26,19 @@ const cars = new Schema({
     },
     year: {
         type: Number,
-        required: true
+        required: true,
+        min: 1886
     },
     mileage: {
         type: Number,
-        required: true
+        required: true,
+        min: 0
     },
     price: {
         type: Number,
-        required: true
+        required: true,
+        min: 0
     }
 });
 
-module.exports = mongoose.model('cars', cars);
+module.exports = mongoose.model('cars', CarSchema);

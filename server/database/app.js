@@ -1,93 +1,99 @@
 /*jshint esversion: 8 */
+// app.js
+// This file defines the main Express server, which handles the CRUD operations for the dealership and review data.
+// The app connects to a MongoDB database, imports data from JSON files, and sets up several API routes to interact with the dealership and review collections.
+
 const express = require('express');
 const mongoose = require('mongoose');
 const fs = require('fs');
-const  cors = require('cors');
+const cors = require('cors');
 const app = express();
 const port = 3030;
 
 app.use(cors());
 app.use(require('body-parser').urlencoded({ extended: false }));
 
+// Load sample data from JSON files
 const reviews_data = JSON.parse(fs.readFileSync("reviews.json", 'utf8'));
 const dealerships_data = JSON.parse(fs.readFileSync("dealerships.json", 'utf8'));
 
 mongoose.connect("mongodb://mongo_db:27017/",{'dbName':'dealershipsDB'});
 
-
 const Reviews = require('./review');
 
 const Dealerships = require('./dealership');
 
-try {
-  Reviews.deleteMany({}).then(()=>{
-    Reviews.insertMany(reviews_data.reviews);
-  });
-  Dealerships.deleteMany({}).then(()=>{
-    Dealerships.insertMany(dealerships_data.dealerships);
-  });
-  
-} catch (error) {
-  res.status(500).json({ error: 'Error fetching documents' });
+// Initialize database with data from json files (for development)
+async function initializeData() {
+  try {
+    await Reviews.deleteMany({});
+    await Reviews.insertMany(reviews_data.reviews);
+    await Dealerships.deleteMany({});
+    await Dealerships.insertMany(dealerships_data.dealerships);
+    console.log("Database initialized with sample data.");
+  } catch (error) {
+    console.error("Error initializing data:", error);
+  }
 }
+initializeData();
 
-
-// Express route to home
+// Routes
+// Basic route to home
 app.get('/', async (req, res) => {
     res.send("Welcome to the Mongoose API");
 });
 
-// Express route to fetch all reviews
+// Fetch all reviews
 app.get('/fetchReviews', async (req, res) => {
   try {
     const documents = await Reviews.find();
     res.json(documents);
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching documents' });
+    res.status(500).json({ error: 'Error fetching Reviews' });
   }
 });
 
-// Express route to fetch reviews by a particular dealer
+// Fetch reviews for a particular dealership (by dealership ID)
 app.get('/fetchReviews/dealer/:id', async (req, res) => {
   try {
     const documents = await Reviews.find({dealership: req.params.id});
     res.json(documents);
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching documents' });
+    res.status(500).json({ error: 'Error fetching Reviews by dealer' });
   }
 });
 
-// Express route to fetch all dealerships
+// Fetch all dealerships
 app.get('/fetchDealers', async (req, res) => {
     try {
         const documents = await Dealerships.find();
         res.json(documents);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching documents' });
+        res.status(500).json({ error: 'Error fetching Dealers' });
     }
 });
 
-// Express route to fetch Dealers by a particular state
+// Fetch dealerships by state
 app.get('/fetchDealers/:state', async (req, res) => {
     try {
         const documents = await Dealerships.find({state: req.params.state});
         res.json(documents);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching documents' });
+        res.status(500).json({ error: 'Error fetching dealers by state' });
     }
 });
 
-// Express route to fetch dealer by a particular id
+// Fetch dealership by ID
 app.get('/fetchDealer/:id', async (req, res) => {
     try {
         const documents = await Dealerships.find({id: req.params.id});
         res.json(documents);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching documents' });
+        res.status(500).json({ error: 'Error fetching dealer by id' });
     }
 });
 
-//Express route to insert review
+// Insert a new review (via POST request)
 app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
   data = JSON.parse(req.body);
   const documents = await Reviews.find().sort( { id: -1 } );
