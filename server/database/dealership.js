@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const DealershipSchema = new Schema({
+const dealerships = new Schema({
 	id: {
     type: Number,
     required: true,
@@ -47,4 +47,4 @@ const DealershipSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('dealerships', DealershipSchema);
+module.exports = mongoose.model('dealerships', dealerships);

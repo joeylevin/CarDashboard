@@ -14,8 +14,13 @@ app.use(cors());
 app.use(require('body-parser').urlencoded({ extended: false }));
 
 // Load sample data from JSON files
-const reviews_data = JSON.parse(fs.readFileSync("reviews.json", 'utf8'));
-const dealerships_data = JSON.parse(fs.readFileSync("dealerships.json", 'utf8'));
+try {
+  reviews_data = JSON.parse(fs.readFileSync("reviews.json", 'utf8'));
+  dealerships_data = JSON.parse(fs.readFileSync("dealerships.json", 'utf8'));
+} catch (error) {
+  console.error("Error loading JSON files:", error);
+  process.exit(1);  // Stop the server if the files are invalid or missing
+}
 
 mongoose.connect("mongodb://mongo_db:27017/",{'dbName':'dealershipsDB'});
 
