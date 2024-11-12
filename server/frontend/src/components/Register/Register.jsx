@@ -35,7 +35,7 @@ const Register = () => {
       let all_dealers = Array.from(retobj.dealers)
       const dealersOptions = all_dealers.map((dealer) => ({
         value: dealer.id,
-        label: `${dealer.full_name} - ${dealer.state}`,
+        label: `${dealer.short_name} - ${dealer.state}`,
       }));
       setDealerList(dealersOptions)
     }

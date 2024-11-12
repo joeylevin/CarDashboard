@@ -1,3 +1,6 @@
+# This script is responsible for populating the Django database with initial data for car makes and car models.
+# It creates instances of the CarMake and CarModel models and associates them accordingly.
+
 from .models import CarMake, CarModel
 
 
