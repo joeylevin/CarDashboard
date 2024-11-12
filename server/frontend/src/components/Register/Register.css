@@ -5,7 +5,7 @@
   margin-top: 2%;
   background-color: darkturquoise;
   min-width: 350px;
-  width: 30%;
+  width: 50%;
 }
 
 .inputs{
@@ -52,6 +52,16 @@
   font: 4em sans-serif;
   color: white;
   margin: .5cm;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.close-btn-container {
+  display: flex;
+  flex-direction: row;
+  justify-self: end;
+  align-self: start;
 }
 
 .img_icon{
