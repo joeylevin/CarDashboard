@@ -1,5 +1,6 @@
 # restapis.py
-# This script provides functions to interact with several backend services via REST APIs.
+# This script provides functions to interact with several backend services
+# via REST APIs.
 
 import requests
 import os
