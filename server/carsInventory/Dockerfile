@@ -2,7 +2,10 @@ FROM node:18.12.1-bullseye-slim
 
 RUN npm install -g npm@9.1.3
 
+WORKDIR /app
+
 ADD package.json .
+ADD package-lock.json .
 ADD app.js .
 ADD data/car_records.json .
 COPY . .

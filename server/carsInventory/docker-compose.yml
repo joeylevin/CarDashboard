@@ -19,5 +19,16 @@ services:
     depends_on: 
       - mongo_db
 
+  test:
+    image: nodeapp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["npm", "test"]
+    depends_on: 
+      - mongo_db
+    environment:
+      IS_TEST: true
+
 volumes:
   mongo_data: {}

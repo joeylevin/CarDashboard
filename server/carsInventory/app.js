@@ -16,24 +16,35 @@ app.use(express.urlencoded({ extended: false }));
 
 const carsData = JSON.parse(fs.readFileSync('car_records.json', 'utf8'));
 
-mongoose.connect('mongodb://mongo_db:27017/', { dbName: 'dealershipsDB' })
-  .then(() => console.log('MongoDB connected Car Inventory'))
-  .catch(err => console.error('MongoDB Car Inventory connection error:', err));
-
+async function connectDatabase() {
+    if (!mongoose.connection.readyState) {
+        try {
+            await mongoose.connect('mongodb://mongo_db:27017/', { dbName: 'dealershipsDB' })
+            console.log('MongoDB connected to Car Inventory');
+            await initializeData();
+        } catch (error) {
+            console.error('MongoDB Car Inventory connection error:', error);
+        }
+    }
+}
 
 const Cars = require('./inventory');
 
 // Initialize database with data from car_records.json (for development)
 async function initializeData() {
-  try {
-    await Cars.deleteMany({});
-    await Cars.insertMany(carsData.cars);
-    console.log("Database initialized with sample data.");
-  } catch (error) {
-    console.error("Error initializing data:", error);
-  }
+    try {
+        await Cars.deleteMany({});
+        await Cars.insertMany(carsData.cars);
+        console.log("Database initialized with sample data.");
+    } catch (error) {
+        console.error("Error initializing data:", error);
+    }
 }
-initializeData();
+
+async function startServer() {
+  await connectDatabase(); // Wait until the database connection is established
+};
+startServer();
 
 // Helper functions for mileage and price conditions
 function getMileageCondition(mileage) {
@@ -56,7 +67,7 @@ function getPriceCondition(price) {
 
 // Basic route
 app.get('/', async (req, res) => {
-  res.send('Welcome to the Mongoose API');
+  res.send('Welcome to the Car Inventory DB');
 });
 
 // Get cars by dealer ID
@@ -124,3 +135,5 @@ app.get('/carsbyyear/:id/:year', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+module.exports = app;
