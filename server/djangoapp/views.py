@@ -57,6 +57,7 @@ def registration(request):
     first_name = data['firstName']
     last_name = data['lastName']
     email = data['email']
+    dealer_id = data['dealer']
     username_exist = False
     # email_exist = False
     try:
@@ -75,7 +76,8 @@ def registration(request):
                                         first_name=first_name,
                                         last_name=last_name,
                                         password=password,
-                                        email=email)
+                                        email=email,
+                                        dealer_id=dealer_id)
         # Login the user and redirect to list page
         login(request, user)
         data = {"userName": username, "status": "Authenticated"}
