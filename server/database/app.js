@@ -22,7 +22,17 @@ try {
   process.exit(1);  // Stop the server if the files are invalid or missing
 }
 
-mongoose.connect("mongodb://mongo_db:27017/",{'dbName':'dealershipsDB'});
+async function connectDatabase() {
+    if (!mongoose.connection.readyState) {
+        try {
+            await mongoose.connect("mongodb://mongo_db:27017/",{'dbName':'dealershipsDB'});
+            console.log('MongoDB connected to Review and Dealership DB');
+            await initializeData();
+        } catch (error) {
+            console.error('Review and Dealership Inventory connection error:', error);
+        }
+    }
+}
 
 const Reviews = require('./review');
 
@@ -40,7 +50,11 @@ async function initializeData() {
     console.error("Error initializing data:", error);
   }
 }
-initializeData();
+
+async function startServer() {
+    await connectDatabase(); // Wait until the database connection is established
+};
+startServer();
 
 // Routes
 // Basic route to home
