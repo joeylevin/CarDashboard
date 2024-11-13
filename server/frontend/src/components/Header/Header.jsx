@@ -52,15 +52,15 @@ const Header = () => {
             <span className="navbar-text">
               <div className="loginlink">
                 {currUser ? (
-                  <div className="d-flex align-items-center">
+                  <>
                     <span className="homepage_links">{currUser}</span>
                     <a className="homepage_links" onClick={logout} href="/">Logout</a>
-                  </div>
+                  </>
                 ) : (
-                  <div className="d-flex align-items-center">
+                  <>
                     <a className="homepage_links" href="/login">Login</a>
                     <a className="homepage_links" href="/register">Register</a>
-                  </div>
+                  </>
                 )}
               </div>
             </span>
