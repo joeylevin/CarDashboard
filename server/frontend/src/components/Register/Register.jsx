@@ -66,8 +66,8 @@ const Register = () => {
           firstName,
           lastName,
           email,
-          userType,
-          dealer: dealer ? dealer.value : null,
+          user_type: userType,
+          dealer_id: dealer ? dealer.value : null,
         }),
       });
 

@@ -1,10 +1,4 @@
-# from django.shortcuts import render
-# from django.http import HttpResponseRedirect, HttpResponse
-from django.contrib.auth.models import User
-# from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth import logout
-# from django.contrib import messages
-# from datetime import datetime
+from django.contrib.auth import logout, get_user_model
 
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate
@@ -18,9 +12,10 @@ from .restapis import get_request, analyze_review_sentiments, \
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
-
+User = get_user_model()
 
 # Create your views here.
+
 
 # Create a `login_request` view to handle sign in request
 @csrf_exempt
@@ -57,7 +52,8 @@ def registration(request):
     first_name = data['firstName']
     last_name = data['lastName']
     email = data['email']
-    dealer_id = data['dealer']
+    dealer_id = data['dealer_id']
+    user_type = data['user_type']
     username_exist = False
     # email_exist = False
     try:
@@ -77,7 +73,8 @@ def registration(request):
                                         last_name=last_name,
                                         password=password,
                                         email=email,
-                                        dealer_id=dealer_id)
+                                        dealer_id=dealer_id,
+                                        user_type=user_type)
         # Login the user and redirect to list page
         login(request, user)
         data = {"userName": username, "status": "Authenticated"}
