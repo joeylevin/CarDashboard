@@ -14,10 +14,12 @@ const Header = () => {
   
     const json = await res.json();
     if (json) {
-      let username = sessionStorage.getItem('username');
-      sessionStorage.removeItem('username');
-      window.location.href = window.location.origin;
-      alert("Logging out "+username+"...")
+        let username = sessionStorage.getItem('username');
+        sessionStorage.removeItem('username');
+        sessionStorage.removeItem('user_type');
+        sessionStorage.removeItem('dealer_id');
+        window.location.href = window.location.origin;
+        alert("Logging out "+username+"...")
     }
     else {
       alert("The user could not be logged out.")

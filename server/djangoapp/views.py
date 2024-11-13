@@ -30,7 +30,12 @@ def login_user(request):
     if user is not None:
         # If user is valid, call login method to login current user
         login(request, user)
-        data = {"userName": username, "status": "Authenticated"}
+        user_type = user.user_type
+        dealer_id = user.dealer_id
+        data = {"userName": username,
+                "status": "Authenticated",
+                "user_type": user_type,
+                "dealer_id": dealer_id}
     return JsonResponse(data)
 
 
@@ -77,7 +82,10 @@ def registration(request):
                                         user_type=user_type)
         # Login the user and redirect to list page
         login(request, user)
-        data = {"userName": username, "status": "Authenticated"}
+        data = {"userName": username,
+                "status": "Authenticated",
+                "user_type": user_type,
+                "dealer_id": dealer_id}
         return JsonResponse(data)
     else:
         data = {"userName": username, "error": "Already Registered"}
@@ -169,4 +177,3 @@ def get_inventory(request, dealer_id):
         return JsonResponse({"status": 200, "cars": cars})
     else:
         return JsonResponse({"status": 400, "message": "Bad Request"})
-    return JsonResponse({"status": 400, "message": "Bad Request"})

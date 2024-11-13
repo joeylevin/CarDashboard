@@ -74,6 +74,10 @@ const Register = () => {
       const json = await res.json();
       if (json.status) {
         sessionStorage.setItem('username', json.userName);
+        sessionStorage.setItem('user_type', json.user_type);
+        if (json.user_type === 'dealer') {
+            sessionStorage.setItem('dealer_id', json.dealer_id);
+        }
         goHome();
       }
       else if (json.error === "Already Registered") {
