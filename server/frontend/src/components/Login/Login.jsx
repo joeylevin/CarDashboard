@@ -29,7 +29,7 @@ const Login = ({ onClose }) => {
             return;
         }
         setIsLoading(true);
-        
+
         try {
             const res = await fetch(login_url, {
                 method: "POST",
@@ -77,38 +77,38 @@ const Login = ({ onClose }) => {
                     <form className="login_panel" style={{}} onSubmit={login}>
                         <div>
                             <span className="input_field">Username </span>
-                            <input 
-                                type="text" 
-                                name="username" 
-                                placeholder="Username" 
-                                className="input_field" 
-                                onChange={(e) => setUserName(e.target.value)} 
-                                disabled={isLoading} 
+                            <input
+                                type="text"
+                                name="username"
+                                placeholder="Username"
+                                className="input_field"
+                                onChange={(e) => setUserName(e.target.value)}
+                                disabled={isLoading}
                             />
                         </div>
                         <div>
                             <span className="input_field">Password </span>
-                            <input 
-                                name="psw" 
-                                type="password" 
-                                placeholder="Password" 
-                                className="input_field" 
-                                onChange={(e) => setPassword(e.target.value)} 
-                                disabled={isLoading} 
+                            <input
+                                name="psw"
+                                type="password"
+                                placeholder="Password"
+                                className="input_field"
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={isLoading}
                             />
                         </div>
                         <div>
-                            <input 
-                                className="action_button" 
-                                type="submit" 
-                                value={isLoading ? "Logging in..." : "Login"} 
-                                disabled={isLoading} 
+                            <input
+                                className="action_button"
+                                type="submit"
+                                value={isLoading ? "Logging in..." : "Login"}
+                                disabled={isLoading}
                             />
-                            <input 
-                                className="action_button" 
-                                type="button" 
-                                value="Cancel" 
-                                onClick={() => navigate("/")} 
+                            <input
+                                className="action_button"
+                                type="button"
+                                value="Cancel"
+                                onClick={() => navigate("/")}
                             />
                         </div>
                         {errorMessage && <p className="error_message">{errorMessage}</p>}

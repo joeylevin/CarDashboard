@@ -7,7 +7,7 @@ import Header from '../Header/Header';
 
 const EditDealer = () => {
     const [dealer, setDealer] = useState({});
-    const [originalDealer, setOriginalDealer] = useState({}); 
+    const [originalDealer, setOriginalDealer] = useState({});
     const [zip, setZip] = useState("");
     const [city, setCity] = useState("");
     const [state, setState] = useState("");

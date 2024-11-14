@@ -32,7 +32,7 @@ const Register = () => {
 
 
     const navigate = useNavigate();
-    
+
     // Endpoint URLs
     const dealer_url = "/djangoapp/get_dealers";
 
