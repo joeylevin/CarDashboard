@@ -53,7 +53,7 @@ async function initializeData() {
 
 async function startServer() {
     await connectDatabase(); // Wait until the database connection is established
-};
+}
 startServer();
 
 // Routes
