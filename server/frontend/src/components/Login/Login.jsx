@@ -1,46 +1,66 @@
+// Login.jsx
+//
+// This component renders a login modal for user authentication. It includes a form where users can enter
+// their username and password to log in to the application. Upon submission, the component sends the
+// credentials to the server and, if authenticated, saves user data to session storage and redirects
+// to the homepage.
 import React, { useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import "./Login.css";
 import Header from '../Header/Header';
 
 const Login = ({ onClose }) => {
-
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
-    const [open, setOpen] = useState(true)
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const navigate = useNavigate();
 
     let login_url = window.location.origin + "/djangoapp/login";
 
     const login = async (e) => {
         e.preventDefault();
+        if (userName === "") {
+            setErrorMessage("Please enter a username")
+            return;
+        }
+        if (password === "") {
+            setErrorMessage("Please enter a password")
+            return;
+        }
+        setIsLoading(true);
+        
+        try {
+            const res = await fetch(login_url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    "userName": userName,
+                    "password": password
+                }),
+            });
 
-        const res = await fetch(login_url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                "userName": userName,
-                "password": password
-            }),
-        });
-
-        const json = await res.json();
-        if (json.status != null && json.status === "Authenticated") {
-            sessionStorage.setItem('username', json.userName);
-            sessionStorage.setItem('user_type', json.user_type);
-            if (json.user_type === 'dealer') {
-                sessionStorage.setItem('dealer_id', json.dealer_id);
+            const json = await res.json();
+            if (json.status != null && json.status === "Authenticated") {
+                sessionStorage.setItem('username', json.userName);
+                sessionStorage.setItem('user_type', json.user_type);
+                if (json.user_type === 'dealer') {
+                    sessionStorage.setItem('dealer_id', json.dealer_id);
+                }
+                navigate("/");
             }
-            setOpen(false);
+            else {
+                console.error("Error authenticating user");
+                setErrorMessage("Invalid credentials. Please check your username and password.");
+            }
+        } catch (error) {
+            console.error("Error log in", error);
+            setErrorMessage("An error occurred. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
-        else {
-            alert("The user could not be authenticated.")
-        }
-    };
-
-    if (!open) {
-        window.location.href = "/";
     };
 
 
@@ -57,16 +77,41 @@ const Login = ({ onClose }) => {
                     <form className="login_panel" style={{}} onSubmit={login}>
                         <div>
                             <span className="input_field">Username </span>
-                            <input type="text" name="username" placeholder="Username" className="input_field" onChange={(e) => setUserName(e.target.value)} />
+                            <input 
+                                type="text" 
+                                name="username" 
+                                placeholder="Username" 
+                                className="input_field" 
+                                onChange={(e) => setUserName(e.target.value)} 
+                                disabled={isLoading} 
+                            />
                         </div>
                         <div>
                             <span className="input_field">Password </span>
-                            <input name="psw" type="password" placeholder="Password" className="input_field" onChange={(e) => setPassword(e.target.value)} />
+                            <input 
+                                name="psw" 
+                                type="password" 
+                                placeholder="Password" 
+                                className="input_field" 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                disabled={isLoading} 
+                            />
                         </div>
                         <div>
-                            <input className="action_button" type="submit" value="Login" />
-                            <input className="action_button" type="button" value="Cancel" onClick={() => setOpen(false)} />
+                            <input 
+                                className="action_button" 
+                                type="submit" 
+                                value={isLoading ? "Logging in..." : "Login"} 
+                                disabled={isLoading} 
+                            />
+                            <input 
+                                className="action_button" 
+                                type="button" 
+                                value="Cancel" 
+                                onClick={() => navigate("/")} 
+                            />
                         </div>
+                        {errorMessage && <p className="error_message">{errorMessage}</p>}
                         <a className="loginlink" href="/register">Register Now</a>
                     </form>
                 </div>
