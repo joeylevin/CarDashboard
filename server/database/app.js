@@ -113,18 +113,16 @@ app.get('/fetchDealer/:id', async (req, res) => {
 });
 
 // Update dealer by id
-app.put('/updateDealer/:id', async (req, res) => {
+app.put('/update_dealer/:id', async (req, res) => {
     try {
-        const updatedDealer = await Dealerships.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true, runValidators: true }  // Return the updated document and apply schema validations
+        const updatedDealer = await Dealerships.updateOne(
+            { id: req.params.id },
+            { $set: req.body }
         );
 
         if (!updatedDealer) {
             return res.status(404).json({ error: 'Dealer not found' });
         }
-
         res.json(updatedDealer);
     } catch (error) {
         console.error("Error updating dealer:", error);
@@ -136,7 +134,7 @@ app.put('/updateDealer/:id', async (req, res) => {
 app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
     data = JSON.parse(req.body);
     const documents = await Reviews.find().sort({ id: -1 });
-    let new_id = documents[0].d + 1;
+    let new_id = documents[0].id + 1;
 
     const review = new Reviews({
         "id": new_id,

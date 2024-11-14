@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import CarMake, CarModel
 from .populate import initiate
 from .restapis import get_request, analyze_review_sentiments, \
-                    post_review, searchcars_request
+                    post_review, searchcars_request, post_dealer
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -155,6 +155,26 @@ def add_review(request):
                                  "message": "Error in posting review"})
     else:
         return JsonResponse({"status": 403, "message": "Unauthorized"})
+
+
+# Create a `Edit dealer` view to Change dealer details
+def edit_dealer(request, dealer_id):
+    if request.user.user_type != 'admin':
+        return JsonResponse({"status": 403, "message": "No Access"},
+                            status=403)
+
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        try:
+            response = post_dealer(data, dealer_id)
+            return JsonResponse(response, status=200)
+        except Exception as err:
+            print("Error editing dealer", err)
+            return JsonResponse({"message": "Error in Editing Dealer"},
+                                status=401)
+    else:
+        print("method not allowed")
+        return JsonResponse({"message": "Method Not Allowed"}, status=405)
 
 
 def get_inventory(request, dealer_id):

@@ -67,6 +67,20 @@ def analyze_review_sentiments(text):
         print("Network exception occurred")
 
 
+def post_dealer(data, dealer_id):
+    request_url = backend_url+"/update_dealer/"+str(dealer_id)
+    try:
+        response = requests.put(request_url, data)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"Failed with status code {response.status_code}")
+            return {"error": "Failed to update dealer"}
+    except Exception as e:
+        print(f"Network exception occurred: {e}")
+        return {"error": "Network exception"}
+
+
 def post_review(data_dict):
     request_url = backend_url+"/insert_review"
     try:
