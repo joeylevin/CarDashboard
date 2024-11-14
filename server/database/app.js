@@ -15,17 +15,17 @@ app.use(require('body-parser').urlencoded({ extended: false }));
 
 // Load sample data from JSON files
 try {
-  reviews_data = JSON.parse(fs.readFileSync("reviews.json", 'utf8'));
-  dealerships_data = JSON.parse(fs.readFileSync("dealerships.json", 'utf8'));
+    reviews_data = JSON.parse(fs.readFileSync("reviews.json", 'utf8'));
+    dealerships_data = JSON.parse(fs.readFileSync("dealerships.json", 'utf8'));
 } catch (error) {
-  console.error("Error loading JSON files:", error);
-  process.exit(1);  // Stop the server if the files are invalid or missing
+    console.error("Error loading JSON files:", error);
+    process.exit(1);  // Stop the server if the files are invalid or missing
 }
 
 async function connectDatabase() {
     if (!mongoose.connection.readyState) {
         try {
-            await mongoose.connect("mongodb://mongo_db:27017/",{'dbName':'dealershipsDB'});
+            await mongoose.connect("mongodb://mongo_db:27017/", { 'dbName': 'dealershipsDB' });
             console.log('MongoDB connected to Review and Dealership DB');
             await initializeData();
         } catch (error) {
@@ -40,15 +40,15 @@ const Dealerships = require('./dealership');
 
 // Initialize database with data from json files (for development)
 async function initializeData() {
-  try {
-    await Reviews.deleteMany({});
-    await Reviews.insertMany(reviews_data.reviews);
-    await Dealerships.deleteMany({});
-    await Dealerships.insertMany(dealerships_data.dealerships);
-    console.log("Database initialized with sample data.");
-  } catch (error) {
-    console.error("Error initializing data:", error);
-  }
+    try {
+        await Reviews.deleteMany({});
+        await Reviews.insertMany(reviews_data.reviews);
+        await Dealerships.deleteMany({});
+        await Dealerships.insertMany(dealerships_data.dealerships);
+        console.log("Database initialized with sample data.");
+    } catch (error) {
+        console.error("Error initializing data:", error);
+    }
 }
 
 async function startServer() {
@@ -64,22 +64,12 @@ app.get('/', async (req, res) => {
 
 // Fetch all reviews
 app.get('/fetchReviews', async (req, res) => {
-  try {
-    const documents = await Reviews.find();
-    res.json(documents);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching Reviews' });
-  }
-});
-
-// Fetch reviews for a particular dealership (by dealership ID)
-app.get('/fetchReviews/dealer/:id', async (req, res) => {
-  try {
-    const documents = await Reviews.find({dealership: req.params.id});
-    res.json(documents);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching Reviews by dealer' });
-  }
+    try {
+        const documents = await Reviews.find();
+        res.json(documents);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching Reviews' });
+    }
 });
 
 // Fetch all dealerships
@@ -95,7 +85,7 @@ app.get('/fetchDealers', async (req, res) => {
 // Fetch dealerships by state
 app.get('/fetchDealers/:state', async (req, res) => {
     try {
-        const documents = await Dealerships.find({state: req.params.state});
+        const documents = await Dealerships.find({ state: req.params.state });
         res.json(documents);
     } catch (error) {
         res.status(500).json({ error: 'Error fetching dealers by state' });
@@ -105,41 +95,61 @@ app.get('/fetchDealers/:state', async (req, res) => {
 // Fetch dealership by ID
 app.get('/fetchDealer/:id', async (req, res) => {
     try {
-        const documents = await Dealerships.find({id: req.params.id});
+        const documents = await Dealerships.find({ id: req.params.id });
         res.json(documents);
     } catch (error) {
         res.status(500).json({ error: 'Error fetching dealer by id' });
     }
 });
 
+// Update dealer by id
+app.put('/updateDealer/:id', async (req, res) => {
+    try {
+        const updatedDealer = await Dealerships.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true, runValidators: true }  // Return the updated document and apply schema validations
+        );
+
+        if (!updatedDealer) {
+            return res.status(404).json({ error: 'Dealer not found' });
+        }
+
+        res.json(updatedDealer);
+    } catch (error) {
+        console.error("Error updating dealer:", error);
+        res.status(500).json({ error: 'Error updating dealer information' });
+    }
+});
+
 // Insert a new review (via POST request)
 app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
-  data = JSON.parse(req.body);
-  const documents = await Reviews.find().sort( { id: -1 } );
-  let new_id = documents[0].d+1;
+    data = JSON.parse(req.body);
+    const documents = await Reviews.find().sort({ id: -1 });
+    let new_id = documents[0].d + 1;
 
-  const review = new Reviews({
-		"id": new_id,
-		"name": data.name,
-		"dealership": data.dealership,
-		"review": data.review,
-		"purchase": data.purchase,
-		"purchase_date": data.purchase_date,
-		"car_make": data.car_make,
-		"car_model": data.car_model,
-		"car_year": data.car_year,
-	});
+    const review = new Reviews({
+        "id": new_id,
+        "name": data.name,
+        "dealership": data.dealership,
+        "review": data.review,
+        "purchase": data.purchase,
+        "purchase_date": data.purchase_date,
+        "car_make": data.car_make,
+        "car_model": data.car_model,
+        "car_year": data.car_year,
+    });
 
-  try {
-    const savedReview = await review.save();
-    res.json(savedReview);
-  } catch (error) {
-		console.log(error);
-    res.status(500).json({ error: 'Error inserting review' });
-  }
+    try {
+        const savedReview = await review.save();
+        res.json(savedReview);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Error inserting review' });
+    }
 });
 
 // Start the Express server
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });
