@@ -6,33 +6,37 @@ import positive_icon from "../assets/positive.png"
 import neutral_icon from "../assets/neutral.png"
 import negative_icon from "../assets/negative.png"
 import review_icon from "../assets/reviewbutton.png"
+import edit_icon from "../assets/edit.png"
 import Header from '../Header/Header';
 
 const Dealer = () => {
+    const [dealer, setDealer] = useState({}); 
+    const [reviews, setReviews] = useState([]);
+    const [unreviewed, setUnreviewed] = useState(false);
+    const [postReview, setPostReview] = useState(<></>)
+    const [editDealer, setEditDealer] = useState(<></>);
 
-
-  const [dealer, setDealer] = useState({});
-  const [reviews, setReviews] = useState([]);
-  const [unreviewed, setUnreviewed] = useState(false);
-  const [postReview, setPostReview] = useState(<></>)
-
-  let curr_url = window.location.href;
-  let root_url = curr_url.substring(0,curr_url.indexOf("dealer"));
-  let params = useParams();
-  let id =params.id;
-  let dealer_url = root_url+`djangoapp/dealer/${id}`;
-  let reviews_url = root_url+`djangoapp/reviews/dealer/${id}`;
-  let post_review = root_url+`postreview/${id}`;
+    const curr_url = window.location.href;
+    const root_url = curr_url.substring(0,curr_url.indexOf("dealer"));
+    const { id } = useParams();
+    const dealer_url = root_url+`djangoapp/dealer/${id}`;
+    const reviews_url = root_url+`djangoapp/reviews/dealer/${id}`;
+    const post_review = root_url+`postreview/${id}`;
+    const post_dealer = root_url+`editdealer/${id}`;
   
   const get_dealer = async ()=>{
-    const res = await fetch(dealer_url, {
-      method: "GET"
-    });
-    const retobj = await res.json();
-    
-    if(retobj.status === 200) {
-      let dealerobjs = Array.from(retobj.dealer)
-      setDealer(dealerobjs[0])
+    try {
+        const res = await fetch(dealer_url, {
+            method: "GET"
+        });
+        const retobj = await res.json();
+        
+        if(retobj.status === 200) {
+            let dealerobjs = Array.from(retobj.dealer)
+            setDealer( dealerobjs[0] );
+        }
+    } catch (err) {
+        console.error("Failed to fetch dealer:", err);
     }
   }
 
@@ -61,8 +65,9 @@ const Dealer = () => {
     get_reviews();
     if(sessionStorage.getItem("username")) {
       setPostReview(<a href={post_review}><img src={review_icon} style={{width:'10%',marginLeft:'10px',marginTop:'10px'}} alt='Post Review'/></a>)
-
-      
+    }
+    if (sessionStorage.getItem("user_type") === "admin") {
+        setEditDealer(<a href={post_dealer}><img src={edit_icon} style={{width:'5%',marginLeft:'10px',marginTop:'10px'}} alt='Edit Dealer'/></a>)
     }
   },[]);  
 
@@ -71,7 +76,7 @@ return(
   <div style={{margin:"20px"}}>
       <Header/>
       <div style={{marginTop:"10px"}}>
-      <h1 style={{color:"grey"}}>{dealer.full_name}{postReview}</h1>
+      <h1 style={{ color: "grey" }}>{dealer.full_name} {editDealer} {postReview}</h1>
       <h4  style={{color:"grey"}}>{dealer['city']},{dealer['address']}, Zip - {dealer['zip']}, {dealer['state']} </h4>
       </div>
       <a href={`/searchcars/${id}`}>Search Cars</a>	
