@@ -72,6 +72,16 @@ app.get('/fetchReviews', async (req, res) => {
     }
 });
 
+// Fetch reviews for a particular dealership (by dealership ID)
+app.get('/fetchReviews/dealer/:id', async (req, res) => {
+    try {
+        const documents = await Reviews.find({ dealership: req.params.id });
+        res.json(documents);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching Reviews by dealer' });
+    }
+});
+
 // Fetch all dealerships
 app.get('/fetchDealers', async (req, res) => {
     try {
