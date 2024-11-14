@@ -55,6 +55,9 @@ const Dealer = () => {
     }
   }
 
+  const allowedEdit = ((sessionStorage.getItem("user_type") === "admin")
+    || ((sessionStorage.getItem("user_type") === "dealer") && (sessionStorage.getItem("dealer_id") === id)));
+
   const senti_icon = (sentiment)=>{
     let icon = sentiment === "positive"?positive_icon:sentiment==="negative"?negative_icon:neutral_icon;
     return icon;
@@ -66,7 +69,7 @@ const Dealer = () => {
     if(sessionStorage.getItem("username")) {
       setPostReview(<a href={post_review}><img src={review_icon} style={{width:'10%',marginLeft:'10px',marginTop:'10px'}} alt='Post Review'/></a>)
     }
-    if (sessionStorage.getItem("user_type") === "admin") {
+    if (allowedEdit) {
         setEditDealer(<a href={post_dealer}><img src={edit_icon} style={{width:'5%',marginLeft:'10px',marginTop:'10px'}} alt='Edit Dealer'/></a>)
     }
   },[]);  
