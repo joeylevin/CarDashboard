@@ -8,6 +8,11 @@ import Header from '../Header/Header';
 const EditDealer = () => {
     const [dealer, setDealer] = useState({});
     const [zip, setZip] = useState("");
+    const [city, setCity] = useState("");
+    const [state, setState] = useState("");
+    const [address, setAddress] = useState("");
+    const [shortName, setShortName] = useState("");
+    const [fullName, settFullName] = useState("");
 
     let curr_url = window.location.href;
     let root_url = curr_url.substring(0, curr_url.indexOf("editdealer"));
@@ -19,6 +24,11 @@ const EditDealer = () => {
     const saveChanges = async () => {
         let jsoninput = JSON.stringify({
             "zip": zip,
+            "city": city,
+            "state": state,
+            "address": address,
+            "short_name": shortName,
+            "full_name": fullName,
         });
 
         const res = await fetch(review_url, {
@@ -45,9 +55,17 @@ const EditDealer = () => {
 
         if (retobj.status === 200) {
             let dealerobjs = Array.from(retobj.dealer)
-            if (dealerobjs.length > 0)
-                setDealer(dealerobjs[0])
-                setZip(dealerobjs[0].zip)
+            if (dealerobjs.length > 0) {
+                let dealerData = dealerobjs[0];
+                setDealer(dealerData)
+                setZip(dealerData.zip)
+                setZip(dealerData.zip || "");
+                setCity(dealerData.city || "");
+                setState(dealerData.state || "");
+                setAddress(dealerData.address || "");
+                setShortName(dealerData.short_name || "");
+                settFullName(dealerData.full_name || "");
+            }
         }
     }
 
@@ -62,7 +80,22 @@ const EditDealer = () => {
             <div style={{ margin: "5%" }}>
                 <h1 style={{ color: "darkblue" }}>{dealer.full_name}</h1>
                 <div className='input_field'>
-                    Zip Code <input type="string" value={zip} onChange={(e) => setZip(e.target.value)} />
+                    Short Name: <input type="text" value={shortName} onChange={(e) => setShortName(e.target.value)} />
+                </div>
+                <div className='input_field'>
+                    Full Name: <input type="text" value={fullName} onChange={(e) => settFullName(e.target.value)} />
+                </div>
+                <div className='input_field'>
+                    Address: <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} />
+                </div>
+                <div className='input_field'>
+                    City: <input type="text" value={city} onChange={(e) => setCity(e.target.value)} />
+                </div>
+                <div className='input_field'>
+                    State: <input type="text" value={state} onChange={(e) => setState(e.target.value)} />
+                </div>
+                <div className='input_field'>
+                    Zip Code: <input type="text" value={zip} onChange={(e) => setZip(e.target.value)} />
                 </div>
 
                 <div>

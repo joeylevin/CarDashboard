@@ -77,7 +77,7 @@ return(
       <Header/>
       <div style={{marginTop:"10px"}}>
       <h1 style={{ color: "grey" }}>{dealer.full_name} {editDealer} {postReview}</h1>
-      <h4  style={{color:"grey"}}>{dealer['city']},{dealer['address']}, Zip - {dealer['zip']}, {dealer['state']} </h4>
+      <h4  style={{color:"grey"}}>{dealer['city']}, {dealer['address']}, {dealer['zip']}, {dealer['state']} </h4>
       </div>
       <a href={`/searchcars/${id}`}>Search Cars</a>	
       <div class="reviews_panel">
