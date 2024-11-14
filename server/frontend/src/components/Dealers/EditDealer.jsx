@@ -7,6 +7,7 @@ import Header from '../Header/Header';
 
 const EditDealer = () => {
     const [dealer, setDealer] = useState({});
+    const [originalDealer, setOriginalDealer] = useState({}); 
     const [zip, setZip] = useState("");
     const [city, setCity] = useState("");
     const [state, setState] = useState("");
@@ -22,21 +23,27 @@ const EditDealer = () => {
     let review_url = root_url + `djangoapp/edit_dealer/${id}`;
 
     const saveChanges = async () => {
-        let jsoninput = JSON.stringify({
-            "zip": zip,
-            "city": city,
-            "state": state,
-            "address": address,
-            "short_name": shortName,
-            "full_name": fullName,
-        });
+        let updatedData = {};
+
+        // Only add fields to updatedData if they have changed
+        if (zip !== originalDealer.zip) updatedData.zip = zip;
+        if (city !== originalDealer.city) updatedData.city = city;
+        if (state !== originalDealer.state) updatedData.state = state;
+        if (address !== originalDealer.address) updatedData.address = address;
+        if (shortName !== originalDealer.short_name) updatedData.short_name = shortName;
+        if (fullName !== originalDealer.full_name) updatedData.full_name = fullName;
+
+        if (Object.keys(updatedData).length === 0) {
+            console.log("No changes detected, update skipped.");
+            return; // Exit function if no changes
+        }
 
         const res = await fetch(review_url, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: jsoninput,
+            body: JSON.stringify(updatedData),
         });
 
         if (res.status === 200) {
@@ -57,8 +64,9 @@ const EditDealer = () => {
             let dealerobjs = Array.from(retobj.dealer)
             if (dealerobjs.length > 0) {
                 let dealerData = dealerobjs[0];
-                setDealer(dealerData)
-                setZip(dealerData.zip)
+                setDealer(dealerData);
+                setOriginalDealer(dealerData);
+                setZip(dealerData.zip);
                 setZip(dealerData.zip || "");
                 setCity(dealerData.city || "");
                 setState(dealerData.state || "");
