@@ -8,7 +8,7 @@ npm run build
 ### Backend 1
 cd server/database  
 docker build . -t nodeapp  
-docker-compose up  
+docker-compose up api
 
 ### Backend 2
 cd server/carsInventory  
