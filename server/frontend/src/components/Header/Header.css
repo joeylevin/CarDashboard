@@ -24,15 +24,16 @@
 }
 
 /* User action links */
-.homepage-links {
-    margin-right: 1rem;
-    font-weight: bold;
-    color: blue;
-    cursor: pointer;
+.homepage_links {
+    color: black;
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: larger;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
 }
 
-.homepage-links:hover {
-    color: darkblue;
+.homepage_links:hover {
+    color: darkturquoise;
     text-decoration: underline;
 }
 
@@ -42,6 +43,3 @@
     gap: 1rem;
 }
 
-.loginlink:hover {
-    color: blue;
-}
