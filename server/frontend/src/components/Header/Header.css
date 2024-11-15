@@ -1,0 +1,47 @@
+/* Header.css */
+
+/* Navbar styling */
+.header-nav {
+    background-color: darkturquoise;
+    height: 1in;
+}
+
+.header-title {
+    padding-right: 5%;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+/* Link styling */
+.header-link {
+    font-size: larger;
+    color: black;
+}
+
+.header-link:hover {
+    text-decoration: underline;
+}
+
+/* User action links */
+.homepage-links {
+    margin-right: 1rem;
+    font-weight: bold;
+    color: blue;
+    cursor: pointer;
+}
+
+.homepage-links:hover {
+    color: darkblue;
+    text-decoration: underline;
+}
+
+/* Login link container */
+.loginlink {
+    display: flex;
+    gap: 1rem;
+}
+
+.loginlink:hover {
+    color: blue;
+}

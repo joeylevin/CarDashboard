@@ -1,6 +1,13 @@
+// SearchCars.jsx
+//
+// This component displays a list of cars available at a specific dealer, 
+// fetched from the backend API. Users can filter cars by various criteria 
+// such as make, model, year, mileage, and price. It includes options to 
+// reset filters and dynamically updates the displayed cars based on user input.
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../Header/Header';
+import './SearchCars.css';
 
 const SearchCars = () => {
     const [cars, setCars] = useState([]);
@@ -11,30 +18,37 @@ const SearchCars = () => {
     const { id } = useParams();
 
     let dealer_url = `/djangoapp/get_inventory/${id}`;
-
     let fetch_url = `/djangoapp/dealer/${id}`;
 
     const fetchDealer = async () => {
-        const res = await fetch(fetch_url, {
-            method: "GET"
-        });
-        const retobj = await res.json();
-        if (retobj.status === 200) {
-            let dealer = retobj.dealer;
-            setDealer({ "full_name": dealer[0].full_name })
+        try {
+            const res = await fetch(fetch_url, {
+                method: "GET"
+            });
+            const retobj = await res.json();
+            if (retobj.status === 200) {
+                let dealer = retobj.dealer;
+                setDealer({ "full_name": dealer[0].full_name })
+            }
+        } catch (err) {
+            console.error("Error fetching dealer", err);
         }
     }
 
     const fetchCars = async () => {
-        const res = await fetch(dealer_url, {
-            method: "GET"
-        });
-        const retobj = await res.json();
+        try {
+            const res = await fetch(dealer_url, {
+                method: "GET"
+            });
+            const retobj = await res.json();
 
-        if (retobj.status === 200) {
-            let cars = Array.from(retobj.cars)
-            setCars(cars);
-            populateMakesAndModels(cars);
+            if (retobj.status === 200) {
+                let cars = Array.from(retobj.cars)
+                setCars(cars);
+                populateMakesAndModels(cars);
+            }
+        } catch (err) {
+            console.error("Error fetching cars", err)
         }
     }
 
@@ -233,81 +247,83 @@ const SearchCars = () => {
     return (
         <div>
             <Header />
-            <h1 style={{ marginBottom: '20px' }}>Cars at {dealer.full_name}</h1>
+            <h1 className="search-cars-title">Cars at {dealer.full_name}</h1>
             <div>
-                <span style={{ marginLeft: '10px', paddingLeft: '10px' }}>Make</span>
-                <select style={{ marginLeft: '10px', marginRight: '10px', paddingLeft: '10px', borderRadius: '10px' }} name="make" id="make" onChange={SearchCarsByMake}>
-                    {makes.length === 0 ? (
-                        <option value=''>No data found</option>
-                    ) : (
-                        <>
-                            <option defaultValue value='all'> -- All -- </option>
-                            {makes.map((make, index) => (
-                                <option key={index} value={make}>
-                                    {make}
-                                </option>
-                            ))}
-                        </>
-                    )
-                    }
-                </select>
-                <span style={{ marginLeft: '10px', paddingLeft: '10px' }}>Model</span>
-                <select style={{ marginLeft: '10px', marginRight: '10px', paddingLeft: '10px', borderRadius: '10px' }} name="model" id="model" onChange={SearchCarsByModel}>
-                    {models.length === 0 ? (
-                        <option value=''>No data found</option>
-                    ) : (
-                        <>
-                            <option defaultValue value='all'> -- All -- </option>
-                            {models.map((model, index) => (
-                                <option key={index} value={model}>
-                                    {model}
-                                </option>
-                            ))}
-                        </>
-                    )}
-                </select>
-                <span style={{ marginLeft: '10px', paddingLeft: '10px' }}>Year</span>
-                <select style={{ marginLeft: '10px', marginRight: '10px', paddingLeft: '10px', borderRadius: '10px' }} name="year" id="year" onChange={SearchCarsByYear}>
-                    <option selected value='all'> -- All -- </option>
-                    <option value='2024'>2024 or newer</option>
-                    <option value='2023'>2023 or newer</option>
-                    <option value='2022'>2022 or newer</option>
-                    <option value='2021'>2021 or newer</option>
-                    <option value='2020'>2020 or newer</option>
-                </select>
-                <span style={{ marginLeft: '10px', paddingLeft: '10px' }}>Mileage</span>
-                <select style={{ marginLeft: '10px', marginRight: '10px', paddingLeft: '10px', borderRadius: '10px' }} name="mileage" id="mileage" onChange={SearchCarsByMileage}>
-                    <option selected value='all'> -- All -- </option>
-                    <option value='50000'>Under 50000</option>
-                    <option value='100000'>50000 - 100000</option>
-                    <option value='150000'>100000 - 150000</option>
-                    <option value='200000'>150000 - 200000</option>
-                    <option value='200001'>Over 200000</option>
-                </select>
-                <span style={{ marginLeft: '10px', paddingLeft: '10px' }}>Price</span>
-                <select style={{ marginLeft: '10px', marginRight: '10px', paddingLeft: '10px', borderRadius: '10px' }} name="price" id="price" onChange={SearchCarsByPrice}>
-                    <option selected value='all'> -- All -- </option>
-                    <option value='20000'>Under 20000</option>
-                    <option value='40000'>20000 - 40000</option>
-                    <option value='60000'>40000 - 60000</option>
-                    <option value='80000'>60000 - 80000</option>
-                    <option value='80001'>Over 80000</option>
-                </select>
+                <div className="filters-container">
+                    <label className="filter-label">Make</label>
+                    <select className="filter-select" id="make" onChange={SearchCarsByMake}>
+                        {makes.length === 0 ? (
+                            <option value=''>No data found</option>
+                        ) : (
+                            <>
+                                <option defaultValue value='all'> -- All -- </option>
+                                {makes.map((make, index) => (
+                                    <option key={index} value={make}>
+                                        {make}
+                                    </option>
+                                ))}
+                            </>
+                        )
+                        }
+                    </select>
+                    <label className="filter-label">Model</label>
+                    <select className="filter-select" id="model" onChange={SearchCarsByModel}>
+                        {models.length === 0 ? (
+                            <option value=''>No data found</option>
+                        ) : (
+                            <>
+                                <option defaultValue value='all'> -- All -- </option>
+                                {models.map((model, index) => (
+                                    <option key={index} value={model}>
+                                        {model}
+                                    </option>
+                                ))}
+                            </>
+                        )}
+                    </select>
+                    <label className="filter-label">Year</label>
+                    <select className="filter-select" id="year" onChange={SearchCarsByYear}>
+                        <option selected value='all'> -- All -- </option>
+                        <option value='2024'>2024 or newer</option>
+                        <option value='2023'>2023 or newer</option>
+                        <option value='2022'>2022 or newer</option>
+                        <option value='2021'>2021 or newer</option>
+                        <option value='2020'>2020 or newer</option>
+                    </select>
+                    <label className="filter-label">Mileage</label>
+                    <select className="filter-select" id="mileage" onChange={SearchCarsByMileage}>
+                        <option selected value='all'> -- All -- </option>
+                        <option value='50000'>Under 50000</option>
+                        <option value='100000'>50000 - 100000</option>
+                        <option value='150000'>100000 - 150000</option>
+                        <option value='200000'>150000 - 200000</option>
+                        <option value='200001'>Over 200000</option>
+                    </select>
+                    <label className="filter-label">Price</label>
+                    <select className="filter-select" name="price" id="price" onChange={SearchCarsByPrice}>
+                        <option selected value='all'> -- All -- </option>
+                        <option value='20000'>Under 20000</option>
+                        <option value='40000'>20000 - 40000</option>
+                        <option value='60000'>40000 - 60000</option>
+                        <option value='80000'>60000 - 80000</option>
+                        <option value='80001'>Over 80000</option>
+                    </select>
 
-                <button style={{ marginLeft: '10px', paddingLeft: '10px' }} onClick={reset}>Reset</button>
+                    <button className="reset-button" onClick={reset}>Reset</button>
+                </div>
 
             </div>
 
 
-            <div style={{ marginLeft: '10px', marginRight: '10px', marginTop: '20px' }} >
+            <div className="cars-list-container" >
                 {cars.length === 0 ? (
-                    <p style={{ marginLeft: '10px', marginRight: '10px', marginTop: '20px' }}>{message}</p>
+                    <p className="loading-message">{message}</p>
                 ) : (
                     <div>
                         <hr />
                         {cars.map((car) => (
                             <div>
-                                <div key={car._id}>
+                                <div className="car-card" key={car._id}>
                                     <h3>{car.make} {car.model}</h3>
                                     <p>Year: {car.year}</p>
                                     <p>Mileage: {car.mileage}</p>

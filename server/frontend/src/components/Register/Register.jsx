@@ -142,7 +142,7 @@ const Register = () => {
                 <span className="text" style={{ flexGrow: "1" }}>SignUp</span>
                 <div className="close-btn-container">
                     <a href="/" onClick={() => { goHome() }} style={{ justifyContent: "space-between", alignItems: "flex-end" }}>
-                        <img style={{ width: "1cm" }} src={close_icon} alt="X" />
+                        <img style={{ width: "1cm" }} src={close_icon} alt="X" aria-label="Close"/>
                     </a>
                 </div>
                 <hr />

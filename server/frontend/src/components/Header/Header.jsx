@@ -1,6 +1,11 @@
+// Header.jsx
+//
+// This component renders a responsive header with navigation links and a login/logout button.
+// User information is retrieved from session storage and displayed when logged in.
 import React, { useEffect, useState } from 'react';
 import "../assets/style.css";
 import "../assets/bootstrap.min.css";
+import "./Header.css";
 
 const Header = () => {
     const [currUser, setCurrUser] = useState(null);
@@ -8,21 +13,27 @@ const Header = () => {
     const logout = async (e) => {
         e.preventDefault();
         const logoutUrl = `${window.location.origin}/djangoapp/logout`;
-        const res = await fetch(logoutUrl, {
-            method: "GET",
-        });
-
-        const json = await res.json();
-        if (json) {
-            let username = sessionStorage.getItem('username');
-            sessionStorage.removeItem('username');
-            sessionStorage.removeItem('user_type');
-            sessionStorage.removeItem('dealer_id');
-            window.location.href = window.location.origin;
-            alert("Logging out " + username + "...")
-        }
-        else {
-            alert("The user could not be logged out.")
+        try {
+            const res = await fetch(logoutUrl, {
+                method: "GET",
+            });
+    
+            const json = await res.json();
+            if (json) {
+                let username = sessionStorage.getItem('username');
+                sessionStorage.removeItem('username');
+                sessionStorage.removeItem('user_type');
+                sessionStorage.removeItem('dealer_id');
+                alert(`Logged out: ${username}`)
+                window.location.href = window.location.origin;
+            }
+            else {
+                console.error("Logout failed: ", json.message || "Unknown error");
+                alert("Could not log out. Please try again.");
+            }
+        } catch (err) {
+            console.error("Logout error: ", err);
+            alert("Network error during logout. Please try again.");
         }
     };
 
@@ -33,22 +44,30 @@ const Header = () => {
 
     return (
         <div>
-            <nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: "darkturquoise", height: "1in" }}>
+            <nav className="navbar navbar-expand-lg navbar-light header-nav">
                 <div className="container-fluid">
-                    <h2 style={{ paddingRight: "5%" }}>Dealerships</h2>
-                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                    <h2 className="header-title">Dealerships</h2>
+                    <button 
+                        className="navbar-toggler" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#navbarText" 
+                        aria-controls="navbarText" 
+                        aria-expanded="false" 
+                        aria-label="Toggle navigation"
+                    >
                         <span className="navbar-toggler-icon"></span>
                     </button>
                     <div className="collapse navbar-collapse" id="navbarText">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             <li className="nav-item">
-                                <a className="nav-link active" style={{ fontSize: "larger" }} aria-current="page" href="/">Home</a>
+                                <a className="nav-link active header-link" aria-current="page" href="/">Home</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" style={{ fontSize: "larger" }} href="/about">About Us</a>
+                                <a className="nav-link header-link" href="/about">About Us</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" style={{ fontSize: "larger" }} href="/contact">Contact Us</a>
+                                <a className="nav-link header-link" href="/contact">Contact Us</a>
                             </li>
                         </ul>
                         <span className="navbar-text">
