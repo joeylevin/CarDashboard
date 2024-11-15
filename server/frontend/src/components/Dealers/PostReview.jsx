@@ -7,7 +7,6 @@
 //  - Allows users to input their review, car details, and purchase date.
 //  - Validates input to ensure all required fields are filled.
 //  - Sends a POST request to submit the review to the backend.
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import "./Dealers.css";
@@ -34,10 +33,9 @@ const PostReview = () => {
     let dealer_url = root_url + `djangoapp/dealer/${id}`;
     let review_url = root_url + `djangoapp/add_review`;
     let carmodels_url = root_url + `djangoapp/get_cars`;
-    console.log(reviewData)
+    const currentYear = new Date().getFullYear();
 
     const handleChange = (e) => {
-        console.log('change', e.target.name, e.target.value)
         const { name, value } = e.target;
         setReviewData(prevState => ({
             ...prevState,
@@ -46,7 +44,6 @@ const PostReview = () => {
     };
 
     const fetchData = async (url, method = 'GET', body = null) => {
-        console.log("fetching", url, method, body)
         try {
             const res = await fetch(url, {
                 method,
@@ -171,7 +168,7 @@ const PostReview = () => {
                 </div >
 
                 <div className='input_field'>
-                    Car Year <input type="number" name="year" onChange={handleChange} max={2023} min={2015} />
+                    Car Year <input type="number" name="year" onChange={handleChange} max={currentYear} min={2015} />
                 </div>
 
                 <div>
