@@ -11,6 +11,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
+import validator from "validator";
 import "./Register.css";
 import user_icon from "../assets/person.png"
 import email_icon from "../assets/email.png"
@@ -41,12 +42,17 @@ const Register = () => {
         navigate("/");
     }
 
+    const userTypeHelper = async (input) => {
+        if (input === "dealer") {
+            get_dealers();
+        }
+        setUserType(input)
+    }
+
     // Fetch the list of dealers for the dropdown
     const get_dealers = async () => {
         try {
-            const res = await fetch(dealer_url, {
-                method: "GET"
-            });
+            const res = await fetch(dealer_url, { method: "GET" });
             const retobj = await res.json();
             if (retobj.status === 200) {
                 // Map dealer data to display-friendly format for Select component
@@ -57,15 +63,14 @@ const Register = () => {
                 }));
                 setDealerList(dealersOptions)
             }
+            else {
+                console.error("Failed to fetch dealers:", retobj.error);
+            }
         } catch (error) {
             console.error("failed to load dealers", error);
+            setErrorMessage("Error loading dealers. Please check your connection.");
         }
     }
-
-    // Fetch dealers once the component mounts
-    useEffect(() => {
-        get_dealers();
-    }, []);
 
     // Handle form submission for registration
     const register = async (e) => {
@@ -73,6 +78,16 @@ const Register = () => {
 
         if (!userName || !password || !firstName || !lastName || !email) {
             setErrorMessage("All fields are required.");
+            return;
+        }
+
+        if (!validator.isEmail(email)) {
+            setErrorMessage("Invalid email format.");
+            return;
+        }
+    
+        if (!validator.isStrongPassword(password, { minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })) {
+            setErrorMessage("Password must be at least 8 characters long and include uppercase, lowercase, a number, and a symbol.");
             return;
         }
 
@@ -86,9 +101,7 @@ const Register = () => {
             // Send registration data to backend
             const res = await fetch(register_url, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json", },
                 body: JSON.stringify({
                     userName,
                     password,
@@ -178,7 +191,7 @@ const Register = () => {
                             name="userType"
                             className="input_field"
                             value={userType}
-                            onChange={(e) => setUserType(e.target.value)}
+                            onChange={(e) => userTypeHelper(e.target.value)}
                         >
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
