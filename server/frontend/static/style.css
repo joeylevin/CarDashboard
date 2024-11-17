@@ -124,3 +124,9 @@ img{
     text-align:center;
     box-shadow: 2px 2px 3px #999;  
 }
+
+.infoContainer {
+    width: 80%;
+    margin: auto; 
+    margin-top:5%
+}

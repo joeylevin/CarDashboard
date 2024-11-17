@@ -3,6 +3,7 @@
 // This component renders a responsive header with navigation links and a login/logout button.
 // User information is retrieved from session storage and displayed when logged in.
 import React, { useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import "../assets/style.css";
 import "../assets/bootstrap.min.css";
 import "./Header.css";
@@ -61,13 +62,32 @@ const Header = () => {
                     <div className="collapse navbar-collapse" id="navbarText">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             <li className="nav-item">
-                                <a className="nav-link active header-link" aria-current="page" href="/">Home</a>
+                                <NavLink
+                                    className="nav-link header-link"
+                                    exact
+                                    to="/"
+                                    activeClassName="active"
+                                >
+                                    Home
+                                </NavLink>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link header-link" href="/about">About Us</a>
+                                <NavLink
+                                        className="nav-link header-link"
+                                        to="/about"
+                                        activeClassName="active"
+                                    >
+                                        About Us
+                                    </NavLink>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link header-link" href="/contact">Contact Us</a>
+                                <NavLink
+                                    className="nav-link header-link"
+                                    to="/contact"
+                                    activeClassName="active"
+                                >
+                                    Contact Us
+                                </NavLink>
                             </li>
                         </ul>
                         <span className="navbar-text">
@@ -79,8 +99,20 @@ const Header = () => {
                                     </>
                                 ) : (
                                     <>
-                                        <a className="homepage_links" href="/login">Login</a>
-                                        <a className="homepage_links" href="/register">Register</a>
+                                        <NavLink
+                                            className="homepage_links"
+                                            to="/login"
+                                            activeClassName="active"
+                                        >
+                                            Login
+                                        </NavLink>
+                                        <NavLink
+                                            className="homepage_links"
+                                            to="/register"
+                                            activeClassName="active"
+                                        >
+                                            Register
+                                        </NavLink>
                                     </>
                                 )}
                             </div>

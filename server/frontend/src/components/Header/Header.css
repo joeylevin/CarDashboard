@@ -43,3 +43,7 @@
     gap: 1rem;
 }
 
+.nav-link.active {
+    font-weight: bold;
+    color: darkblue;
+}
