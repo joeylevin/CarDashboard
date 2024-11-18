@@ -8,7 +8,6 @@ import Header from '../Header/Header';
 const Contact = () => {
     return (
         <div>
-            <Header />            
             <main className="container mt-5">
                 <section className="contact-info">
                     <h2 className="text-primary">Contact Customer Service</h2>

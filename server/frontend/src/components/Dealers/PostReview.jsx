@@ -131,7 +131,6 @@ const PostReview = () => {
 
     return (
         <div>
-            <Header />
             <div style={{ margin: "5%" }}>
                 <h1 style={{ color: "darkblue" }}>{dealer.full_name}</h1>
                 <textarea

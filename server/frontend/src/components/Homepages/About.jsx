@@ -6,7 +6,6 @@ import Header from '../Header/Header';
 const About = () => {
     return (
         <div>
-            <Header />
             <div className="card infoContainer" >
                 <div className="banner" name="about-header">
                     <h1>About Us</h1>

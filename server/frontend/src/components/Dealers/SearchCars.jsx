@@ -246,7 +246,6 @@ const SearchCars = () => {
 
     return (
         <div>
-            <Header />
             <h1 className="search-cars-title">Cars at {dealer.full_name}</h1>
             <div>
                 <div className="filters-container">

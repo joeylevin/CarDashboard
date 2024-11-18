@@ -66,7 +66,6 @@ const Login = ({ onClose }) => {
 
     return (
         <div>
-            <Header />
             <div onClick={onClose}>
                 <div
                     onClick={(e) => {

@@ -99,7 +99,6 @@ const EditDealer = () => {
 
     return (
         <div>
-            <Header />
             <div style={{ margin: "5%" }}>
                 <h1 style={{ color: "darkblue" }}>{dealer.full_name}</h1>
                 <div className='input_field'>

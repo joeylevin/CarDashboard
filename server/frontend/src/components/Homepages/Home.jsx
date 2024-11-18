@@ -6,7 +6,6 @@ import Header from '../Header/Header';
 const Home = () => {
     return (
         <div>
-            <Header />
             <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div className="card" style={{ width: '50%', marginTop: '50px', alignSelf: 'center' }}>
                     <img src="static/car_dealership.jpg" className="card-img-top" alt="..." />

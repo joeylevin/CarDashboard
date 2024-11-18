@@ -57,7 +57,6 @@ const Dealers = () => {
 
     return (
         <div>
-            <Header />
             <table className='table'>
                 <thead>
                     <tr>
