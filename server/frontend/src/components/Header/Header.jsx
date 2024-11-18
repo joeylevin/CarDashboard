@@ -67,7 +67,7 @@ const Header = () => {
                             </li>
                             <li className="nav-item">
                                 <NavLink
-                                        className="nav-link header-link"
+                                        className="nav-link"
                                         to="/about"
                                         activeClassName="active"
                                     >
@@ -76,7 +76,7 @@ const Header = () => {
                             </li>
                             <li className="nav-item">
                                 <NavLink
-                                    className="nav-link header-link"
+                                    className="nav-link"
                                     to="/contact"
                                     activeClassName="active"
                                 >
@@ -88,20 +88,20 @@ const Header = () => {
                             <div className="loginlink">
                                 {currUser.username ? (
                                     <>
-                                        <span className="userName">{currUser.username}</span>
+                                        <span className="homepage_links">{currUser.username}</span>
                                         <a className="homepage_links" onClick={logoutHelper} href="/">Logout</a>
                                     </>
                                 ) : (
                                     <>
                                         <NavLink
-                                            className="homepage_links"
+                                            className="nav-link"
                                             to="/login"
                                             activeClassName="active"
                                         >
                                             Login
                                         </NavLink>
                                         <NavLink
-                                            className="homepage_links"
+                                            className="nav-link"
                                             to="/register"
                                             activeClassName="active"
                                         >

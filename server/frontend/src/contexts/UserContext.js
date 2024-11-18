@@ -11,7 +11,7 @@ export const UserProvider = ({ children }) => {
     const login = (username, user_type, dealer_id) => {
         const userInfo = { username, user_type, dealer_id };
         setCurrUser(userInfo);
-        localStorage.setItem('currUser', JSON.stringify(currUser));
+        localStorage.setItem('currUser', JSON.stringify(userInfo));
     };
 
     const logout = () => {

@@ -14,12 +14,12 @@
 }
 
 /* Link styling */
-.header-link {
+.nav-link {
     font-size: larger;
     color: black;
 }
 
-.header-link:hover {
+.nav-link:hover {
     text-decoration: underline;
 }
 
@@ -30,6 +30,10 @@
     margin: 0 10px;
     font-size: larger;
     transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+.homepage_links:hover {
+    text-decoration: underline;
 }
 
 /* Login link container */
