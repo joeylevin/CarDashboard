@@ -52,8 +52,10 @@ class CustomUserManager(BaseUserManager):
                           user_type=user_type,
                           **extra_fields)
 
-        if user_type == 'dealer' and dealer_id:
+        if user_type == 'dealer' and dealer_id is not None:
             user.dealer_id = dealer_id
+        else:
+            user.dealer_id = None
 
         user.set_password(password)
         user.save(using=self._db)

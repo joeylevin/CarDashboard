@@ -36,7 +36,10 @@ def login_user(request):
                 "status": "Authenticated",
                 "user_type": user_type,
                 "dealer_id": dealer_id}
-    return JsonResponse(data)
+        return JsonResponse(data)
+    if user is None:
+        data = {"userName": username, "error": "Invalid credentials"}
+        return JsonResponse(data, status=400)
 
 
 # Create a `logout_request` view to handle sign out request
@@ -63,8 +66,8 @@ def registration(request):
     # email_exist = False
     try:
         # Check if user already exists
-        User.objects.get(username=username)
-        username_exist = True
+        if User.objects.filter(username=username).exists():
+            username_exist = True
     except Exception as e:
         print(f"Error: {e}")
         # If not, simply log this is a new user
