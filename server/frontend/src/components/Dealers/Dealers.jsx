@@ -1,22 +1,27 @@
+//  Dealers.jsx
+//  This component displays a list of car dealerships with a search and review functionality.
+//  Fetches a list of dealerships from the backend and displays them in a table format.
+//  Provides a search bar to filter dealerships by state in real-time.
+//  Displays key dealership details such as ID, name, city, address, zip code, and state.
+//  Allows logged-in users to navigate to a "Post Review" page for a dealership.
+
 import React, { useState, useEffect } from 'react';
 import "./Dealers.css";
 import "../assets/style.css";
 import Header from '../Header/Header';
 import review_icon from "../assets/reviewicon.png"
+import { useDebounce } from "use-debounce";
 
 const Dealers = () => {
     const [dealersList, setDealersList] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [originalDealers, setOriginalDealers] = useState([]);
+    const [debouncedQuery] = useDebounce(searchQuery, 300);
     const dealer_url = "/djangoapp/get_dealers";
+    const isLoggedIn = !!sessionStorage.getItem("username");
 
     const handleInputChange = (event) => {
-        const query = event.target.value;
-        setSearchQuery(query);
-        const filtered = originalDealers.filter(dealer =>
-            dealer.state.toLowerCase().includes(query.toLowerCase())
-        );
-        setDealersList(filtered);
+        setSearchQuery(event.target.value);
     };
 
     const handleLostFocus = () => {
@@ -38,10 +43,18 @@ const Dealers = () => {
     }
 
     useEffect(() => {
+        const filtered = originalDealers.filter(dealer =>
+            dealer.state.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+            dealer.city.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+            dealer.full_name.toLowerCase().includes(debouncedQuery.toLowerCase())
+        );
+        setDealersList(filtered);
+    }, [debouncedQuery, originalDealers]);
+
+    useEffect(() => {
         get_dealers();
     }, []);
 
-    let isLoggedIn = sessionStorage.getItem("username") != null;
     return (
         <div>
             <Header />
@@ -56,7 +69,8 @@ const Dealers = () => {
                         <th>
                             <input
                                 type="text"
-                                placeholder="Search states..."
+                                placeholder="Search states, cities, or dealer names..."
+                                aria-label="Search by state, city, or dealer name"
                                 onChange={handleInputChange}
                                 onBlur={handleLostFocus}
                                 value={searchQuery}

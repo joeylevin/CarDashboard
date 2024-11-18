@@ -1,3 +1,13 @@
+//  EditDealer.jsx
+//  This component allows admins to edit the details of a specific dealership.
+//
+//  Fetches dealership data from the backend and pre-populates the form.
+//  Allows updating fields such as short name, full name, address, city, state, and zip code.
+//  Tracks changes and only submits modified fields to the backend.
+//  Sends a POST request to update the dealership details in the database.
+//  Redirects back to the dealership's page upon successful update.
+//  Includes basic error handling for network issues or invalid responses.
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import "./Dealers.css";
@@ -46,6 +56,12 @@ const EditDealer = () => {
             body: JSON.stringify(updatedData),
         });
 
+        if (!res.ok) {
+            console.error("Failed to update dealer:", res.statusText);
+            alert("An error occurred while saving changes. Please try again.");
+            return;
+        }
+
         if (res.status === 200) {
             window.location.href = window.location.origin + "/dealer/" + id;
         }
@@ -66,7 +82,6 @@ const EditDealer = () => {
                 let dealerData = dealerobjs[0];
                 setDealer(dealerData);
                 setOriginalDealer(dealerData);
-                setZip(dealerData.zip);
                 setZip(dealerData.zip || "");
                 setCity(dealerData.city || "");
                 setState(dealerData.state || "");
