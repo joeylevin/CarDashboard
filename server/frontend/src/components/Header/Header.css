@@ -32,11 +32,6 @@
     transition: color 0.3s ease, text-decoration 0.3s ease;
 }
 
-.homepage_links:hover {
-    color: darkturquoise;
-    text-decoration: underline;
-}
-
 /* Login link container */
 .loginlink {
     display: flex;
@@ -46,4 +41,12 @@
 .nav-link.active {
     font-weight: bold;
     color: darkblue;
+}
+
+.userName {
+    color: black;
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: larger;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
 }

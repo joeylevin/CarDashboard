@@ -4,13 +4,14 @@
 // their username and password to log in to the application. Upon submission, the component sends the
 // credentials to the server and, if authenticated, saves user data to session storage and redirects
 // to the homepage.
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "./Login.css";
-import Header from '../Header/Header';
+import { UserContext } from '../../contexts/UserContext';
 
 const Login = ({ onClose }) => {
     const [userName, setUserName] = useState("");
+    const { login } = useContext(UserContext);
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -18,7 +19,7 @@ const Login = ({ onClose }) => {
 
     let login_url = window.location.origin + "/djangoapp/login";
 
-    const login = async (e) => {
+    const loginHelper = async (e) => {
         e.preventDefault();
         if (userName === "") {
             setErrorMessage("Please enter a username")
@@ -44,11 +45,8 @@ const Login = ({ onClose }) => {
 
             const json = await res.json();
             if (json.status != null && json.status === "Authenticated") {
-                sessionStorage.setItem('username', json.userName);
-                sessionStorage.setItem('user_type', json.user_type);
-                if (json.user_type === 'dealer') {
-                    sessionStorage.setItem('dealer_id', json.dealer_id);
-                }
+                login(json.userName, json.user_type, json.dealer_id)
+            
                 navigate("/");
             }
             else {
@@ -73,7 +71,7 @@ const Login = ({ onClose }) => {
                     }}
                     className='modalContainer'
                 >
-                    <form className="login_panel" style={{}} onSubmit={login}>
+                    <form className="login_panel" style={{}} onSubmit={loginHelper}>
                         <div>
                             <span className="input_field">Username </span>
                             <input

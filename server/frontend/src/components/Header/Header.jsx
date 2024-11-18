@@ -2,16 +2,17 @@
 //
 // This component renders a responsive header with navigation links and a login/logout button.
 // User information is retrieved from session storage and displayed when logged in.
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
+import { UserContext } from '../../contexts/UserContext';
 import "../assets/style.css";
 import "../assets/bootstrap.min.css";
 import "./Header.css";
 
 const Header = () => {
-    const [currUser, setCurrUser] = useState(null);
+    const { currUser, logout } = useContext(UserContext);
 
-    const logout = async (e) => {
+    const logoutHelper = async (e) => {
         e.preventDefault();
         const logoutUrl = `${window.location.origin}/djangoapp/logout`;
         try {
@@ -21,10 +22,8 @@ const Header = () => {
     
             const json = await res.json();
             if (json) {
-                let username = sessionStorage.getItem('username');
-                sessionStorage.removeItem('username');
-                sessionStorage.removeItem('user_type');
-                sessionStorage.removeItem('dealer_id');
+                let username = currUser.username
+                logout();
                 alert(`Logged out: ${username}`)
                 window.location.href = window.location.origin;
             }
@@ -37,11 +36,6 @@ const Header = () => {
             alert("Network error during logout. Please try again.");
         }
     };
-
-    useEffect(() => {
-        const user = sessionStorage.getItem('username');
-        setCurrUser(user ? user : null);
-    }, []);
 
     return (
         <div>
@@ -92,10 +86,10 @@ const Header = () => {
                         </ul>
                         <span className="navbar-text">
                             <div className="loginlink">
-                                {currUser ? (
+                                {currUser.username ? (
                                     <>
-                                        <span className="homepage_links">{currUser}</span>
-                                        <a className="homepage_links" onClick={logout} href="/">Logout</a>
+                                        <span className="userName">{currUser.username}</span>
+                                        <a className="homepage_links" onClick={logoutHelper} href="/">Logout</a>
                                     </>
                                 ) : (
                                     <>
