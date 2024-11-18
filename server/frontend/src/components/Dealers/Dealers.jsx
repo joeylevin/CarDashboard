@@ -5,20 +5,19 @@
 //  Displays key dealership details such as ID, name, city, address, zip code, and state.
 //  Allows logged-in users to navigate to a "Post Review" page for a dealership.
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import "./Dealers.css";
 import "../assets/style.css";
-import Header from '../Header/Header';
 import review_icon from "../assets/reviewicon.png"
 import { useDebounce } from "use-debounce";
+import { DealerContext } from '../../contexts/DealerContext';
 
 const Dealers = () => {
     const [dealersList, setDealersList] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [originalDealers, setOriginalDealers] = useState([]);
     const [debouncedQuery] = useDebounce(searchQuery, 300);
-    const dealer_url = "/djangoapp/get_dealers";
     const isLoggedIn = !!sessionStorage.getItem("username");
+    const { dealers } = useContext(DealerContext);
 
     const handleInputChange = (event) => {
         setSearchQuery(event.target.value);
@@ -26,34 +25,18 @@ const Dealers = () => {
 
     const handleLostFocus = () => {
         if (!searchQuery) {
-            setDealersList(originalDealers);
-        }
-    }
-
-    const get_dealers = async () => {
-        const res = await fetch(dealer_url, {
-            method: "GET"
-        });
-        const retobj = await res.json();
-        if (retobj.status === 200) {
-            let all_dealers = Array.from(retobj.dealers)
-            setDealersList(all_dealers)
-            setOriginalDealers(all_dealers);
+            setDealersList(dealers);
         }
     }
 
     useEffect(() => {
-        const filtered = originalDealers.filter(dealer =>
+        const filtered = dealers.filter(dealer =>
             dealer.state.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
             dealer.city.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
             dealer.full_name.toLowerCase().includes(debouncedQuery.toLowerCase())
         );
         setDealersList(filtered);
-    }, [debouncedQuery, originalDealers]);
-
-    useEffect(() => {
-        get_dealers();
-    }, []);
+    }, [debouncedQuery, dealers]);
 
     return (
         <div>

@@ -7,16 +7,17 @@
 // - The form submission triggers an API call to register the user. 
 // - On successful registration, the user is redirected to the home page and relevant session information is stored.
 // - Errors are handled and alert messages are displayed for missing or invalid input.
-
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import validator from "validator";
+import { DealerContext } from '../../contexts/DealerContext';
 import "./Register.css";
 import user_icon from "../assets/person.png"
 import email_icon from "../assets/email.png"
 import password_icon from "../assets/password.png"
 import close_icon from "../assets/close.png"
+import { UserContext } from "../../contexts/UserContext";
 
 // Register component handles user registration for different user types.
 const Register = () => {
@@ -27,15 +28,14 @@ const Register = () => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [userType, setUserType] = useState("user");
+    const { dealers, loading, error } = useContext(DealerContext);
     const [dealer, setDealer] = useState(null); // Store selected dealer (if any)
     const [dealerList, setDealerList] = useState([]); // Store the list of dealers
     const [errorMessage, setErrorMessage] = useState(""); // Error message for validation or server errors
+    const { login } = useContext(UserContext);
 
 
     const navigate = useNavigate();
-
-    // Endpoint URLs
-    const dealer_url = "/djangoapp/get_dealers";
 
     // Navigate to home
     const goHome = () => {
@@ -44,32 +44,17 @@ const Register = () => {
 
     const userTypeHelper = async (input) => {
         if (input === "dealer") {
-            get_dealers();
+            const dealersOptions = dealers.map((dealer) => ({
+                value: dealer.id,
+                label: `${dealer.short_name} - ${dealer.state}`,
+            }));
+            setDealerList(dealersOptions)
+            if (error) setErrorMessage("Error loading dealers. Please check your connection.");
+        }
+        else {
+            if (error) setErrorMessage("");
         }
         setUserType(input)
-    }
-
-    // Fetch the list of dealers for the dropdown
-    const get_dealers = async () => {
-        try {
-            const res = await fetch(dealer_url, { method: "GET" });
-            const retobj = await res.json();
-            if (retobj.status === 200) {
-                // Map dealer data to display-friendly format for Select component
-                let all_dealers = Array.from(retobj.dealers)
-                const dealersOptions = all_dealers.map((dealer) => ({
-                    value: dealer.id,
-                    label: `${dealer.short_name} - ${dealer.state}`,
-                }));
-                setDealerList(dealersOptions)
-            }
-            else {
-                console.error("Failed to fetch dealers:", retobj.error);
-            }
-        } catch (error) {
-            console.error("failed to load dealers", error);
-            setErrorMessage("Error loading dealers. Please check your connection.");
-        }
     }
 
     // Handle form submission for registration
@@ -95,7 +80,6 @@ const Register = () => {
             setErrorMessage("Please select a dealer if registering as a dealer.");
             return;
         }
-
         let register_url = window.location.origin + "/djangoapp/register";
         try {
             // Send registration data to backend
@@ -116,11 +100,7 @@ const Register = () => {
             const json = await res.json();
             // Handle successful registration
             if (json.status) {
-                sessionStorage.setItem('username', json.userName);
-                sessionStorage.setItem('user_type', json.user_type);
-                if (json.user_type === 'dealer') {
-                    sessionStorage.setItem('dealer_id', json.dealer_id);
-                }
+                login(json.userName, json.user_type, json.dealer_id)
                 goHome();
             }
             // Handle specific error for already registered username
@@ -202,15 +182,19 @@ const Register = () => {
                     {userType === "dealer" && (
                         <div className="input">
                             <label htmlFor="dealer">Select Dealer</label>
-                            <Select
-                                options={dealerList}
-                                value={dealer}
-                                className="input_field"
-                                onChange={setDealer} // Set the selected dealer
-                                isSearchable={true}
-                                placeholder="Search dealers..."
-                                getOptionLabel={(e) => e.label}
-                            />
+                            {loading ? (
+                                <p>Loading dealers...</p>
+                            ) : (
+                                <Select
+                                    options={dealerList}
+                                    value={dealer}
+                                    className="input_field"
+                                    onChange={setDealer} // Set the selected dealer
+                                    isSearchable={true}
+                                    placeholder="Search dealers..."
+                                    getOptionLabel={(e) => e.label}
+                                />
+                            )}
                         </div>
                     )}
                     <div>
