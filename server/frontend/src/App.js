@@ -9,21 +9,30 @@ import Home from "./components/Homepages/Home"
 import EditDealer from "./components/Dealers/EditDealer";
 import About from "./components/Homepages/About";
 import Contact from "./components/Homepages/Contact";
+import DealerProvider from './contexts/DealerContext';
+import NotFound from "./components/Homepages/NotFound";
+import Header from "./components/Header/Header";
 
 function App() {
     return (
-        <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/login" element={<LoginPanel />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dealers" element={<Dealers />} />
-            <Route path="/dealer/:id" element={<Dealer />} />
-            <Route path="/postreview/:id" element={<PostReview />} />
-            <Route path="/editdealer/:id" element={<EditDealer />} />
-            <Route path="/searchcars/:id" element={<SearchCars />} />
-        </Routes>
+        <DealerProvider>
+            <div>
+                <Header />
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/login" element={<LoginPanel />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/dealers" element={<Dealers />} />
+                    <Route path="/dealer/:id" element={<Dealer />} />
+                    <Route path="/postreview/:id" element={<PostReview />} />
+                    <Route path="/editdealer/:id" element={<EditDealer />} />
+                    <Route path="/searchcars/:id" element={<SearchCars />} />
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+            </div>
+        </DealerProvider>
     );
 }
 export default App;
