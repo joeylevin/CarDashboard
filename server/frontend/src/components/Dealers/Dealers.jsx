@@ -17,7 +17,7 @@ const Dealers = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedQuery] = useDebounce(searchQuery, 300);
     const isLoggedIn = !!sessionStorage.getItem("username");
-    const { dealers } = useContext(DealerContext);
+    const { dealers, error, loading } = useContext(DealerContext);
 
     const handleInputChange = (event) => {
         setSearchQuery(event.target.value);
@@ -37,6 +37,15 @@ const Dealers = () => {
         );
         setDealersList(filtered);
     }, [debouncedQuery, dealers]);
+
+    if (error) {
+        return <div className="error-message">Error Loading Dealers. Please check your connection</div>;
+    }
+
+    // Show loading message while data is being fetched
+    if (loading) {
+        return <div className="loading-message">Loading dealers...</div>;
+    }
 
     return (
         <div>

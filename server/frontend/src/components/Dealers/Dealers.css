@@ -87,3 +87,15 @@ table{
   transform: scale(1.1);
    border: 2px solid #080808;
 }
+
+.loading-message {
+    text-align: center;
+    font-size: 1.2em;
+    color: #555;
+}
+
+.error-message {
+    text-align: center;
+    font-size: 1.2em;
+    color: red;
+}
