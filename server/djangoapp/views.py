@@ -9,12 +9,13 @@ from .models import CarMake, CarModel
 from .populate import initiate
 from .restapis import get_request, analyze_review_sentiments, \
                     post_review, searchcars_request, post_dealer
+import openai
+import os
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 User = get_user_model()
-
-# Create your views here.
+openai.api_key = os.getenv('OpenAIAPIKey')
 
 
 # Create a `login_request` view to handle sign in request
@@ -202,3 +203,37 @@ def get_inventory(request, dealer_id):
         return JsonResponse({"status": 200, "cars": cars})
     else:
         return JsonResponse({"status": 400, "message": "Bad Request"})
+
+
+def chat_view(request):
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        user_message = body.get('userMessage', '')
+        # Get the user's message from the request data
+
+        if not user_message:
+            return JsonResponse({"error": "No message provided"}, status=400)
+
+        try:
+            # Make the request to OpenAI's GPT-3/4 API
+            response = openai.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", 
+                     "content": "You are a helpful assistant."},
+                    {
+                        "role": "user",
+                        "content": user_message
+                    }
+                ]
+            )
+
+            # Get the response from the API
+            chat_gpt_message = response.choices[0].message.content
+
+            return JsonResponse({"response": chat_gpt_message})
+
+        except openai.OpenAIError as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)

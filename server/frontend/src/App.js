@@ -13,6 +13,7 @@ import DealerProvider from './contexts/DealerContext';
 import NotFound from "./components/Homepages/NotFound";
 import Header from "./components/Header/Header";
 import { UserProvider } from "./contexts/UserContext";
+import ChatBot from "./components/Chat/ChatBot";
 
 function App() {
     return (
@@ -33,6 +34,7 @@ function App() {
                         <Route path="/searchcars/:id" element={<SearchCars />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>
+                    <ChatBot />
                 </div>
             </UserProvider>
         </DealerProvider>
