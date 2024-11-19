@@ -12,6 +12,15 @@ const port = 3030;
 
 app.use(cors());
 app.use(require('body-parser').urlencoded({ extended: false }));
+// Log all requests if needed
+// app.use((req, res, next) => {
+//     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+//     console.log('Headers:', req.headers);
+//     if (Object.keys(req.body).length) {
+//         console.log('Body:', req.body);
+//     }
+//     next(); // Pass control to the next middleware or route handler
+// });
 
 // Load sample data from JSON files
 try {
@@ -82,6 +91,16 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
     }
 });
 
+// Fetch review by it's id
+app.get('/fetchReviews/:id', async (req, res) => {
+    try {
+        const documents = await Reviews.find({ id: req.params.id });
+        res.json(documents);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching Reviews by dealer' });
+    }
+});
+
 // Fetch all dealerships
 app.get('/fetchDealers', async (req, res) => {
     try {
@@ -113,7 +132,7 @@ app.get('/fetchDealer/:id', async (req, res) => {
 });
 
 // Update dealer by id
-app.put('/update_dealer/:id', async (req, res) => {
+app.put('/update_dealer/:id', express.json(), async (req, res) => {
     try {
         const updatedDealer = await Dealerships.updateOne(
             { id: req.params.id },
@@ -139,6 +158,7 @@ app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
     const review = new Reviews({
         "id": new_id,
         "name": data.name,
+        "username": data.username,
         "dealership": data.dealership,
         "review": data.review,
         "purchase": data.purchase,
@@ -154,6 +174,24 @@ app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Error inserting review' });
+    }
+});
+
+// Edit a review (via POST request)
+app.put('/edit_review/:id', express.json(), async (req, res) => {
+    try {
+        const updatedReview = await Reviews.updateOne(
+            { id: req.params.id },
+            { $set: req.body }
+        );
+
+        if (!updatedReview) {
+            return res.status(404).json({ error: 'Review not found' });
+        }
+        res.json(updatedReview);
+    } catch (error) {
+        console.error("Error updating Review:", error);
+        res.status(500).json({ error: 'Error updating Review' });
     }
 });
 
