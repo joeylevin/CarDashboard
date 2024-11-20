@@ -8,7 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import CarMake, CarModel
 from .populate import initiate
 from .restapis import get_request, analyze_review_sentiments, \
-                    post_review, searchcars_request, post_dealer
+                    post_review, searchcars_request, post_dealer, \
+                    put_review
 import openai
 import os
 
@@ -137,6 +138,24 @@ def get_dealer_reviews(request, dealer_id):
         return JsonResponse({"status": 400, "message": "Bad Request"})
 
 
+# Create a `get_dealer_reviews` view to render the reviews of a dealer
+def get_review(request, review_id):
+    if (review_id):
+        endpoint = "/fetchReviews/"+str(review_id)
+        review = get_request(endpoint)
+        if review is not None:
+            response = analyze_review_sentiments(review[0]['review'])
+            if response is not None:
+                review[0]['sentiment'] = response['sentiment']
+            else:
+                review[0]['sentiment'] = ""
+            return JsonResponse({"status": 200, "reviews": review[0]})
+        else:
+            return JsonResponse({"status": 400, "message": "review not found"})
+    else:
+        return JsonResponse({"status": 400, "message": "Bad Request"})
+
+
 # Create a `get_dealer_details` view to render the dealer details
 def get_dealer_details(request, dealer_id):
     if (dealer_id):
@@ -174,6 +193,28 @@ def edit_dealer(request, dealer_id):
             except Exception as err:
                 print("Error editing dealer", err)
                 return JsonResponse({"message": "Error in Editing Dealer"},
+                                    status=401)
+        else:
+            print("method not allowed")
+            return JsonResponse({"message": "Method Not Allowed"}, status=405)
+    else:
+        return JsonResponse({"status": 403, "message": "No Access"},
+                            status=403)
+
+
+# Create a `Edit Review` view to Change Review details
+def edit_review(request, review_id):
+    user_type = request.user.user_type
+    if (user_type == 'admin'):
+        # (request.user.username == request.body.)):
+        if request.method == 'PUT':
+            data = json.loads(request.body)
+            try:
+                response = put_review(data, review_id)
+                return JsonResponse(response, status=200)
+            except Exception as err:
+                print("Error editing Review", err)
+                return JsonResponse({"message": "Error in Editing Review"},
                                     status=401)
         else:
             print("method not allowed")

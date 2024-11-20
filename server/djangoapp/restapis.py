@@ -64,7 +64,7 @@ def analyze_review_sentiments(text):
         return response.json()
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
-        print("Network exception occurred")
+        print("Network exception occurred for Sentiment")
 
 
 def post_dealer(data, dealer_id):
@@ -89,3 +89,17 @@ def post_review(data_dict):
         return response.json()
     except Exception as e:
         print(f"Network exception occurred: {e}")
+
+
+def put_review(data, review_id):
+    request_url = backend_url+"/edit_review/"+str(review_id)
+    try:
+        response = requests.put(request_url, data)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"Failed with status code {response.status_code}")
+            return {"error": "Failed to update Review"}
+    except Exception as e:
+        print(f"Network exception occurred: {e}")
+        return {"error": "Network exception"}
