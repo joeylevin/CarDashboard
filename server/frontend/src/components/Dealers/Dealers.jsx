@@ -11,12 +11,13 @@ import "../assets/style.css";
 import review_icon from "../assets/reviewicon.png"
 import { useDebounce } from "use-debounce";
 import { DealerContext } from '../../contexts/DealerContext';
+import { UserContext } from '../../contexts/UserContext';
 
 const Dealers = () => {
     const [dealersList, setDealersList] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedQuery] = useDebounce(searchQuery, 300);
-    const isLoggedIn = !!sessionStorage.getItem("username");
+    const { currUser } = useContext(UserContext);
     const { dealers, error, loading } = useContext(DealerContext);
 
     const handleInputChange = (event) => {
@@ -67,7 +68,7 @@ const Dealers = () => {
                                 value={searchQuery}
                             />
                         </th>
-                        {isLoggedIn && <th>Review Dealer</th>}
+                        {currUser.username && <th>Review Dealer</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -79,7 +80,7 @@ const Dealers = () => {
                             <td>{dealer['address']}</td>
                             <td>{dealer['zip']}</td>
                             <td>{dealer['state']}</td>
-                            {isLoggedIn ? (
+                            {currUser.username ? (
                                 <td><a href={`/postreview/${dealer['id']}`}><img src={review_icon} className="review_icon" alt="Post Review" /></a></td>
                             ) : <></>
                             }

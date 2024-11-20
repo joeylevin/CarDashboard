@@ -100,7 +100,7 @@ const Register = () => {
             const json = await res.json();
             // Handle successful registration
             if (json.status) {
-                login(json.userName, json.user_type, json.dealer_id)
+                login(json.userName, json.user_type, json.dealer_id, json.firstName, json.lastName)
                 goHome();
             }
             // Handle specific error for already registered username

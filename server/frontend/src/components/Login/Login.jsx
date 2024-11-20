@@ -45,7 +45,7 @@ const Login = ({ onClose }) => {
 
             const json = await res.json();
             if (json.status != null && json.status === "Authenticated") {
-                login(json.userName, json.user_type, json.dealer_id)
+                login(json.userName, json.user_type, json.dealer_id, json.firstName, json.lastName)
             
                 navigate("/");
             }

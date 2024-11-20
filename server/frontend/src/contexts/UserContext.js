@@ -8,8 +8,8 @@ export const UserProvider = ({ children }) => {
         return savedUser ? JSON.parse(savedUser) : {};
     });
 
-    const login = (username, user_type, dealer_id) => {
-        const userInfo = { username, user_type, dealer_id };
+    const login = (username, user_type, dealer_id, firstname, lastname) => {
+        const userInfo = { username, user_type, dealer_id, firstname, lastname};
         setCurrUser(userInfo);
         localStorage.setItem('currUser', JSON.stringify(userInfo));
     };
