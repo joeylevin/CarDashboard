@@ -1,18 +1,15 @@
-//
 //  PostReview.jsx
 //  This component allows users to post a review for a dealership.
-//  * 
-//  Features:
-//  - Fetches dealership details and car models from the backend.
-//  - Allows users to input their review, car details, and purchase date.
-//  - Validates input to ensure all required fields are filled.
-//  - Sends a POST request to submit the review to the backend.
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+//  Allows users to input their review, car details, and purchase date.
+//  Validates input to ensure all required fields are filled.
+//  Sends a POST request to submit the review to the backend.
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import Toastify from 'toastify-js';
+import 'toastify-js/src/toastify.css';
 import "./Dealers.css";
 import "../assets/style.css";
-import Header from '../Header/Header';
-
+import { UserContext } from '../../contexts/UserContext';
 
 const PostReview = () => {
     const [dealer, setDealer] = useState({});
@@ -23,16 +20,36 @@ const PostReview = () => {
         date: "",
     });    
     const [carmodels, setCarmodels] = useState([]);
+    const { currUser } = useContext(UserContext);
+    const [originalReview, setOriginalReview] = useState({});
     const navigate = useNavigate();
-    let params = useParams();
-    let id = params.id;
+    const location = useLocation();
+    let {id, reviewid} = useParams();
 
+    useEffect(() => {
+        if (location.state && location.state.reviewData) {
+            setReviewData({
+                review: location.state.reviewData.review,
+                model: location.state.reviewData.car_make + " " + location.state.reviewData.car_model,
+                year: location.state.reviewData.car_year,
+                date: location.state.reviewData.purchase_date,
+            });
+            setOriginalReview({
+                review: location.state.reviewData.review,
+                car_make: location.state.reviewData.car_make,
+                car_model: location.state.reviewData.car_model,
+                year: location.state.reviewData.car_year,
+                date: location.state.reviewData.purchase_date,
+            });
+        }
+    }, [location.state]);
 
-    let curr_url = window.location.href;
-    let root_url = curr_url.substring(0, curr_url.indexOf("postreview"));
-    let dealer_url = root_url + `djangoapp/dealer/${id}`;
-    let review_url = root_url + `djangoapp/add_review`;
-    let carmodels_url = root_url + `djangoapp/get_cars`;
+    const curr_url = window.location.href;
+    const root_url = curr_url.substring(0, curr_url.indexOf("postreview"));
+    const dealer_url = root_url + `djangoapp/dealer/${id}`;
+    const review_url = root_url + `djangoapp/add_review`;
+    const carmodels_url = root_url + `djangoapp/get_cars`;
+    const update_review_url = root_url + `djangoapp/put_review`;
     const currentYear = new Date().getFullYear();
 
     const handleChange = (e) => {
@@ -59,12 +76,7 @@ const PostReview = () => {
     };    
 
     const postreview = async () => {
-        let name = sessionStorage.getItem("firstname") + " " + sessionStorage.getItem("lastname");
         const { model, review, date, year } = reviewData;
-        //If the first and second name are stores as null, use the username
-        if (name.includes("null")) {
-            name = sessionStorage.getItem("username");
-        }
 
         if (!model || !review || !date || !year) {
             alert("All details are mandatory")
@@ -79,24 +91,62 @@ const PostReview = () => {
         const [make_chosen, ...model_parts] = model.split(" ");
         const model_chosen = model_parts.join(" ");
 
-        let jsoninput = JSON.stringify({
-            "name": name,
-            "dealership": id,
-            "review": review,
-            "purchase": true,
-            "purchase_date": date,
-            "car_make": make_chosen,
-            "car_model": model_chosen,
-            "car_year": year,
-        });
+        let updatedData = {};
 
-        const json = await fetchData(review_url, 'POST', jsoninput);
+        // Only add fields to updatedData if they have changed
+        if (review !== originalReview.review) updatedData.review = review;
+        if (make_chosen !== originalReview.car_make) updatedData.car_make = make_chosen;
+        if (model_chosen !== originalReview.car_model) updatedData.car_model = model_chosen;
+        if (year !== originalReview.year) updatedData.car_year = year;
+        if (date !== originalReview.date) updatedData.purchase_date = date;
 
-        if (json.status === 200) {
-            navigate(`/dealer/${id}`);
-            alert("Review submitted successfully!");
+        let url;
+        let method;
+
+        if (reviewid) {
+            // If reviewId exists, it's an edit, so use PUT
+            if (Object.keys(updatedData).length === 0) {
+                console.log("No changes detected, update skipped.");
+                return; // Exit function if no changes
+            }
+            url = `${update_review_url}/${reviewid}`
+            method = 'PUT';
+        }
+        else {
+            url = review_url;
+            method = 'POST';
+            const name = currUser.firstname ? currUser.firstname + currUser.lastname : currUser.username
+            const  username = currUser.username
+            updatedData.name = name;
+            updatedData.username = username;
+            updatedData.dealership = id;
+            updatedData.purchase = true;
         }
 
+        try {
+            const res = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedData)
+            });
+            if (!res.ok) throw new Error("Network response was not ok");
+            if (res.status === 200) {
+                navigate(`/dealer/${id}`);
+                Toastify({
+                    text: reviewid ? "Review Edited successfully!" : "Review Submitted successfully!",
+                    duration: 10000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "linear-gradient(to right, #4CAF50, #43A047)",
+                }).showToast();
+            }
+            else {
+                alert("Issue updating Review. Please check your connection");
+            }
+        } catch (error) {
+            console.error("There was an error:", error);
+            alert("An error occurred while updating review. Please try again.");
+        }
     }
     const get_dealer = async () => {
         const retobj = await fetchData(dealer_url);
@@ -138,13 +188,14 @@ const PostReview = () => {
                     name="review"
                     aria-label="Review text"
                     placeholder="Write your review here..."
+                    value={reviewData.review}
                     cols='50'
                     rows='7'
                     onChange={handleChange}
                 />
                 <div className='input_field'>
                     Purchase Date
-                    <input type="date" name="date" onChange={handleChange} />
+                    <input type="date" value={reviewData.date} name="date" onChange={handleChange} />
                 </div>                
                 <div className='input_field'>
                     Car Make
@@ -167,7 +218,7 @@ const PostReview = () => {
                 </div >
 
                 <div className='input_field'>
-                    Car Year <input type="number" name="year" onChange={handleChange} max={currentYear} min={2015} />
+                    Car Year <input type="number" name="year" value={reviewData.year} onChange={handleChange} max={currentYear} min={2015} />
                 </div>
 
                 <div>
