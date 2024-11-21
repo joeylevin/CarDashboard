@@ -3,6 +3,7 @@
 // new reviews and editing dealer information based on user permissions.
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { getDistance } from 'geolib';
 import "./Dealers.css";
 import "../assets/style.css";
 import positive_icon from "../assets/positive.png"
@@ -16,7 +17,8 @@ const Dealer = () => {
     const [dealer, setDealer] = useState({});
     const [reviews, setReviews] = useState([]);
     const [unreviewed, setUnreviewed] = useState(false);
-    const { currUser } = useContext(UserContext);
+    const [distance, setDistance] = useState(null);
+    const { currUser, getUserLocation, location } = useContext(UserContext);
     const navigate = useNavigate();
 
     const curr_url = window.location.href;
@@ -70,10 +72,57 @@ const Dealer = () => {
         return <img src={icon} className="emotion_icon" alt="Sentiment" />;
     }
 
+    const displayDistance = () => {
+        if (distance !== null) {
+            let displayVal;
+            let unit;
+            let distanceInKm = distance/1000;
+            if (distanceInKm > 10000) {
+                // Round to nearest 1000 km
+                displayVal = Math.round(distanceInKm / 1000) * 1000
+                unit = "km"
+            } else if (distanceInKm > 1000) {
+                // Round to nearest 500 km
+                displayVal = Math.round(distanceInKm / 500) * 500
+                unit = "km"
+            } else if (distanceInKm > 100) {
+                // Round to nearest 50 km
+                displayVal = Math.round(distanceInKm / 50) * 50
+                unit = "km"
+            } else if (distanceInKm > 10) {
+                // Round to 5
+                displayVal = Math.round(distanceInKm / 5) * 5
+                unit = "km"
+            }
+            else {
+                // Less than 10 km, show in meters
+                displayVal = Math.round(distance)
+                unit = "m"
+            }
+            return (
+                <h5>
+                    {displayVal.toLocaleString()} {unit} away from you
+                </h5>
+            )
+        }
+    }
+
     useEffect(() => {
         get_dealer();
         get_reviews();
+        getUserLocation();
     }, []);
+
+    useEffect(() => {
+        if (location && dealer.lat && dealer.long) {
+            const distanceInMeters = getDistance(
+                { latitude: location.latitude, longitude: location.longitude },
+                { latitude: dealer.lat, longitude: dealer.long }
+            );
+            setDistance(distanceInMeters);  // Distance in meters
+        }
+    }, [location, dealer]);
+
 
     return (
         <div style={{ margin: "20px" }}>
@@ -95,6 +144,7 @@ const Dealer = () => {
                     )}
                 </h1>
                 <h4 style={{ color: "grey" }}>{dealer['city']}, {dealer['address']}, {dealer['zip']}, {dealer['state']} </h4>
+                {displayDistance()}
             </div>
             <a href={`/searchcars/${id}`}>Search Cars</a>
             <div className="reviews_panel">
