@@ -1,13 +1,9 @@
 When filter by make, update the models list
 Add page for each car with more information
-add chat bot
 add dealer view
     as a dealer, when you go to that page can add/edit cars
 Add admin view
     can add/edit dealerships
     and can add/edit cars from all dealerships
-distance from your location
 
 Next
-    add edit option to reviews when signed in as that user
-    Move about and contact to be react and use header

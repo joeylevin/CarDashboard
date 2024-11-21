@@ -6,18 +6,20 @@
 //  Allows logged-in users to navigate to a "Post Review" page for a dealership.
 
 import React, { useState, useEffect, useContext } from 'react';
+import { getDistance } from 'geolib';
 import "./Dealers.css";
 import "../assets/style.css";
 import review_icon from "../assets/reviewicon.png"
 import { useDebounce } from "use-debounce";
 import { DealerContext } from '../../contexts/DealerContext';
 import { UserContext } from '../../contexts/UserContext';
+import { displayDistance } from '../../utils/helpers';
 
 const Dealers = () => {
     const [dealersList, setDealersList] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedQuery] = useDebounce(searchQuery, 300);
-    const { currUser } = useContext(UserContext);
+    const { currUser, location, getUserLocation } = useContext(UserContext);
     const { dealers, error, loading } = useContext(DealerContext);
 
     const handleInputChange = (event) => {
@@ -39,6 +41,11 @@ const Dealers = () => {
         setDealersList(filtered);
     }, [debouncedQuery, dealers]);
 
+    useEffect(() => {
+        getUserLocation();
+    }, []);
+
+
     if (error) {
         return <div className="error-message">Error Loading Dealers. Please check your connection</div>;
     }
@@ -49,7 +56,17 @@ const Dealers = () => {
     }
 
     return (
-        <div>
+        <div className='dealers-container'>
+            <div className='search-container'>
+                <input
+                    type="text"
+                    placeholder="Search states, cities, or dealer names..."
+                    aria-label="Search by state, city, or dealer name"
+                    onChange={handleInputChange}
+                    onBlur={handleLostFocus}
+                    value={searchQuery}
+                />
+            </div>
             <table className='table'>
                 <thead>
                     <tr>
@@ -58,16 +75,8 @@ const Dealers = () => {
                         <th>City</th>
                         <th>Address</th>
                         <th>Zip</th>
-                        <th>
-                            <input
-                                type="text"
-                                placeholder="Search states, cities, or dealer names..."
-                                aria-label="Search by state, city, or dealer name"
-                                onChange={handleInputChange}
-                                onBlur={handleLostFocus}
-                                value={searchQuery}
-                            />
-                        </th>
+                        <th>State</th>
+                        {location && <th>Distance</th>}
                         {currUser.username && <th>Review Dealer</th>}
                     </tr>
                 </thead>
@@ -80,6 +89,11 @@ const Dealers = () => {
                             <td>{dealer['address']}</td>
                             <td>{dealer['zip']}</td>
                             <td>{dealer['state']}</td>
+                            <td>{location && displayDistance(getDistance(
+                                { latitude: location.latitude, longitude: location.longitude },
+                                { latitude: dealer.lat, longitude: dealer.long })
+                            )}
+                            </td>
                             {currUser.username ? (
                                 <td><a href={`/postreview/${dealer['id']}`}><img src={review_icon} className="review_icon" alt="Post Review" /></a></td>
                             ) : <></>
