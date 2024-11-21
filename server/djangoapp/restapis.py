@@ -5,6 +5,7 @@
 import requests
 import os
 from dotenv import load_dotenv
+from django.http import JsonResponse
 
 load_dotenv()
 
@@ -97,9 +98,18 @@ def put_review(data, review_id):
         response = requests.put(request_url, data)
         if response.status_code == 200:
             return response.json()
+        elif response.status_code == 403:
+            return JsonResponse({"message": "Forbidden: You do not have \
+                                permission to edit this review"},
+                                status=403)
+        elif response.status_code == 404:
+            return JsonResponse({"message": "Review not found"},
+                                status=404)
         else:
             print(f"Failed with status code {response.status_code}")
-            return {"error": "Failed to update Review"}
+            return JsonResponse({"message":
+                                "An error occurred editing the review"},
+                                status=500)
     except Exception as e:
         print(f"Network exception occurred: {e}")
         return {"error": "Network exception"}

@@ -180,14 +180,20 @@ app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
 // Edit a review (via POST request)
 app.put('/edit_review/:id', express.json(), async (req, res) => {
     try {
+        const review = await Reviews.findOne({ id: req.params.id });
+
+        if (!review) {
+            return res.status(404).json({ error: 'Review not found' });
+        }
+
+        if (review.username !== req.body.username) {
+            return res.status(403).json({ error: 'Forbidden: You do not have permission to edit this review' });
+        }
         const updatedReview = await Reviews.updateOne(
             { id: req.params.id },
             { $set: req.body }
         );
 
-        if (!updatedReview) {
-            return res.status(404).json({ error: 'Review not found' });
-        }
         res.json(updatedReview);
     } catch (error) {
         console.error("Error updating Review:", error);

@@ -99,6 +99,7 @@ const PostReview = () => {
         if (model_chosen !== originalReview.car_model) updatedData.car_model = model_chosen;
         if (year !== originalReview.year) updatedData.car_year = year;
         if (date !== originalReview.date) updatedData.purchase_date = date;
+        updatedData.username = currUser.username;
 
         let url;
         let method;
@@ -116,9 +117,7 @@ const PostReview = () => {
             url = review_url;
             method = 'POST';
             const name = currUser.firstname ? currUser.firstname + currUser.lastname : currUser.username
-            const  username = currUser.username
             updatedData.name = name;
-            updatedData.username = username;
             updatedData.dealership = id;
             updatedData.purchase = true;
         }

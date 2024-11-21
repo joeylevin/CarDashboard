@@ -204,24 +204,18 @@ def edit_dealer(request, dealer_id):
 
 # Create a `Edit Review` view to Change Review details
 def edit_review(request, review_id):
-    user_type = request.user.user_type
-    if (user_type == 'admin'):
-        # (request.user.username == request.body.)):
-        if request.method == 'PUT':
-            data = json.loads(request.body)
-            try:
-                response = put_review(data, review_id)
-                return JsonResponse(response, status=200)
-            except Exception as err:
-                print("Error editing Review", err)
-                return JsonResponse({"message": "Error in Editing Review"},
-                                    status=401)
-        else:
-            print("method not allowed")
-            return JsonResponse({"message": "Method Not Allowed"}, status=405)
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        try:
+            response = put_review(data, review_id)
+            return JsonResponse(response)
+        except Exception as err:
+            print("Error editing Review", err)
+            return JsonResponse({"message": "Error in Editing Review"},
+                                status=401)
     else:
-        return JsonResponse({"status": 403, "message": "No Access"},
-                            status=403)
+        print("method not allowed")
+        return JsonResponse({"message": "Method Not Allowed"}, status=405)
 
 
 def get_inventory(request, dealer_id):
