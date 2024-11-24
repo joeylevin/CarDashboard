@@ -13,6 +13,7 @@ import review_icon from "../assets/reviewbutton.png"
 import edit_icon from "../assets/edit.png"
 import { UserContext } from '../../contexts/UserContext';
 import { displayDistance } from '../../utils/helpers';
+import MapComponent from './Map';
 
 const Dealer = () => {
     const [dealer, setDealer] = useState({});
@@ -110,7 +111,8 @@ const Dealer = () => {
                     )}
                 </h1>
                 <h4 style={{ color: "grey" }}>{dealer['city']}, {dealer['address']}, {dealer['zip']}, {dealer['state']} </h4>
-                {displayDistance(distance)} away from you
+                <h5>{displayDistance(distance)} away from you </h5>
+                <MapComponent address={dealer.address} />
             </div>
             <a href={`/searchcars/${id}`}>Search Cars</a>
             <div className="reviews_panel">
