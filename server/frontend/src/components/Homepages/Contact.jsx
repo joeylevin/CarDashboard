@@ -3,7 +3,6 @@
 import React from 'react';
 import "../assets/style.css";
 import "../assets/bootstrap.min.css";
-import Header from '../Header/Header';
 
 const Contact = () => {
     return (
@@ -11,7 +10,7 @@ const Contact = () => {
             <main className="container mt-5">
                 <section className="contact-info">
                     <h2 className="text-primary">Contact Customer Service</h2>
-                    <img src="/static/cars.jpg" alt="Cars in showroom" clclassNameass="img-fluid" />
+                    <img src="/static/cars.jpg" alt="Cars in showroom" className="img-fluid" />
                     <ul className="list-unstyled">
                         <li>
                             Email: 
@@ -50,8 +49,8 @@ const Contact = () => {
                 </section>
             </main>
 
-            <footer class="bg-info text-white text-center py-3">
-                <p>&copy; 2024 Joey's Cars Dealership</p>
+            <footer className="bg-info text-white text-center py-3">
+                <p>&copy; 2024 Joey&apos;s Cars Dealership</p>
             </footer>    
         </div>
     );

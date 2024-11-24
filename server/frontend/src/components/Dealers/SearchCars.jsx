@@ -6,7 +6,6 @@
 // reset filters and dynamically updates the displayed cars based on user input.
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import Header from '../Header/Header';
 import './SearchCars.css';
 
 const SearchCars = () => {
@@ -321,8 +320,8 @@ const SearchCars = () => {
                     <div>
                         <hr />
                         {cars.map((car) => (
-                            <div>
-                                <div className="car-card" key={car._id}>
+                            <div key={car._id}>
+                                <div className="car-card">
                                     <h3>{car.make} {car.model}</h3>
                                     <p>Year: {car.year}</p>
                                     <p>Mileage: {car.mileage}</p>

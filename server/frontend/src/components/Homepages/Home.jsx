@@ -1,7 +1,6 @@
 import React from 'react';
 import "../assets/style.css";
 import "../assets/bootstrap.min.css";
-import Header from '../Header/Header';
 
 const Home = () => {
     return (

@@ -110,7 +110,7 @@ const Dealer = () => {
                     )}
                 </h1>
                 <h4 style={{ color: "grey" }}>{dealer['city']}, {dealer['address']}, {dealer['zip']}, {dealer['state']} </h4>
-                {displayDistance()} away from you
+                {displayDistance(distance)} away from you
             </div>
             <a href={`/searchcars/${id}`}>Search Cars</a>
             <div className="reviews_panel">

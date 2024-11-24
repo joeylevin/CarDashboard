@@ -1,3 +1,8 @@
+/**
+ * DealerContext.js
+ * Provides a context for managing dealer data (`dealers`), loading state (`loading`), and errors (`error`).
+ * Fetches dealer data from the server on mount using `get_dealers` and updates the state accordingly.
+ */
 import React, { createContext, useState, useEffect } from 'react';
 
 export const DealerContext = createContext();

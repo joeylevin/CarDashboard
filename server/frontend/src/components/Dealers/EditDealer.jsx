@@ -12,7 +12,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import "./Dealers.css";
 import "../assets/style.css";
-import Header from '../Header/Header';
 
 
 const EditDealer = () => {

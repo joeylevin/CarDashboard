@@ -1,5 +1,10 @@
+/**
+ * UserContext.js
+ * This file defines a UserContext using React's Context API to manage user authentication and location data.
+ * It provides a UserProvider component that wraps the application and allows access to user information, 
+ * login/logout functionality, and geolocation. The current user's data is stored in localStorage for persistence.
+ */
 import React, { createContext, useState } from "react";
-import Toastify from 'toastify-js';
 
 export const UserContext = createContext();
 
@@ -8,24 +13,19 @@ export const UserProvider = ({ children }) => {
         const savedUser = localStorage.getItem('currUser');
         return savedUser ? JSON.parse(savedUser) : {};
     });
-    const [location, setLocation] = useState(null)
+    const [location, setLocation] = useState({ latitude: null, longitude: null });
 
     const login = (username, user_type, dealer_id, firstname, lastname) => {
         const userInfo = { username, user_type, dealer_id, firstname, lastname};
-        setCurrUser(userInfo);
-        localStorage.setItem('currUser', JSON.stringify(userInfo));
+        if (JSON.stringify(currUser) !== JSON.stringify(userInfo)) {
+            setCurrUser(userInfo);
+            localStorage.setItem('currUser', JSON.stringify(userInfo));
+        }
     };
 
 
     const getUserLocation = () => {
         if (navigator.geolocation) {
-            Toastify({
-                text: "We need access to your location to show nearby dealers.",
-                duration: 5000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "linear-gradient(to right, #4CAF50, #43A047)",
-            }).showToast();
             navigator.geolocation.getCurrentPosition((position) => {
                 const { latitude, longitude } = position.coords;
                 setLocation({ latitude, longitude });
