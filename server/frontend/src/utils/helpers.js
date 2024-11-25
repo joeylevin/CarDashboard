@@ -25,10 +25,6 @@ export const displayDistance = (distance) => {
             displayVal = Math.round(distance)
             unit = "m"
         }
-        return (
-            <h5>
-                {displayVal.toLocaleString()} {unit}
-            </h5>
-        )
+        return `${displayVal.toLocaleString()} ${unit}`;
     }
 }

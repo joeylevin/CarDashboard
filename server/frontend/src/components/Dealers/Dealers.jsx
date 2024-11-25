@@ -32,6 +32,18 @@ const Dealers = () => {
         }
     }
 
+    const locationHelper = (lat, long) => {
+        try {
+            return displayDistance(getDistance(
+                { latitude: location.latitude, longitude: location.longitude },
+                { latitude: lat, longitude: long })
+            )
+        } catch (err) {
+            console.log("err location display", err);
+            return "N/A"
+        } 
+    }
+
     useEffect(() => {
         const filtered = dealers.filter(dealer =>
             dealer.state.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
@@ -55,6 +67,10 @@ const Dealers = () => {
         return <div className="loading-message">Loading dealers...</div>;
     }
 
+    if (Object.keys(dealersList).length === 0) {
+        return <div className="loading-message">No dealers found. Please check your connection.</div>;
+    }
+
     return (
         <div className='dealers-container'>
             <div className='search-container'>
@@ -76,7 +92,7 @@ const Dealers = () => {
                         <th>Address</th>
                         <th>Zip</th>
                         <th>State</th>
-                        {location && <th>Distance</th>}
+                        {location.found && <th>Distance</th>}
                         {currUser.username && <th>Review Dealer</th>}
                     </tr>
                 </thead>
@@ -89,10 +105,7 @@ const Dealers = () => {
                             <td>{dealer['address']}</td>
                             <td>{dealer['zip']}</td>
                             <td>{dealer['state']}</td>
-                            <td>{location && displayDistance(getDistance(
-                                { latitude: location.latitude, longitude: location.longitude },
-                                { latitude: dealer.lat, longitude: dealer.long })
-                            )}
+                            <td>{location.found && locationHelper(dealer.lat, dealer.long)}
                             </td>
                             {currUser.username ? (
                                 <td><a href={`/postreview/${dealer['id']}`}><img src={review_icon} className="review_icon" alt="Post Review" /></a></td>

@@ -20,12 +20,11 @@ const DealerProvider = ({ children }) => {
             if (retobj.status === 200) {
                 setDealers(Array.from(retobj.dealers));
                 setError(false);
+                setLoading(false);
             }
         } catch (error) {
             setError(true);
             console.error("Failed to fetch dealers:", error);
-        } finally {
-            setLoading(false);
         }
     };
 

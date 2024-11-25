@@ -13,7 +13,7 @@ export const UserProvider = ({ children }) => {
         const savedUser = localStorage.getItem('currUser');
         return savedUser ? JSON.parse(savedUser) : {};
     });
-    const [location, setLocation] = useState({ latitude: null, longitude: null });
+    const [location, setLocation] = useState({ latitude: null, longitude: null, found: false });
 
     const login = (username, user_type, dealer_id, firstname, lastname) => {
         const userInfo = { username, user_type, dealer_id, firstname, lastname};
@@ -28,7 +28,7 @@ export const UserProvider = ({ children }) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
                 const { latitude, longitude } = position.coords;
-                setLocation({ latitude, longitude });
+                setLocation({ latitude, longitude, found: true });
             }, (error) => {
                 console.error("Error getting location:", error);
             });
