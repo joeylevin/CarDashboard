@@ -81,7 +81,7 @@ const Dealer = () => {
     }, []);
 
     useEffect(() => {
-        if (location && dealer.lat && dealer.long) {
+        if (location.found && dealer.lat && dealer.long) {
             const distanceInMeters = getDistance(
                 { latitude: location.latitude, longitude: location.longitude },
                 { latitude: dealer.lat, longitude: dealer.long }
