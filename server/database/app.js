@@ -149,11 +149,47 @@ app.put('/update_dealer/:id', express.json(), async (req, res) => {
     }
 });
 
+// Update dealer by id
+app.post('/new_dealer/', express.json(), async (req, res) => {
+    try {
+        const { full_name, address, city, zip, state, st, lat, long, short_name } = req.body;
+        if (!full_name || !address || !city || !zip || !state || !st || !lat || !long || !short_name) {
+            return res.status(400).json({ error: 'All fields are required.' });
+        }
+        const documents = await Dealerships.find().sort({ id: -1 });
+        const new_id = documents.length > 0 ? documents[0].id + 1 : 1;
+
+        const dealer = new Dealerships({
+            id: new_id,
+            full_name,
+            address,
+            city,
+            zip,
+            state,
+            st, 
+            lat,
+            long,
+            short_name
+        });
+    
+        try {
+            const savedDealer = await dealer.save();
+            res.json(savedDealer);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Error creating dealer' });
+        }
+    } catch (error) {
+        console.error("Error creating dealer:", error);
+        res.status(500).json({ error: 'Error creating dealer' });
+    }
+});
+
 // Insert a new review (via POST request)
 app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
     data = JSON.parse(req.body);
     const documents = await Reviews.find().sort({ id: -1 });
-    let new_id = documents[0].id + 1;
+    const new_id = documents.length > 0 ? documents[0].id + 1 : 1;
 
     const review = new Reviews({
         "id": new_id,
