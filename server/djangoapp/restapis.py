@@ -68,7 +68,7 @@ def analyze_review_sentiments(text):
         print("Network exception occurred for Sentiment")
 
 
-def post_dealer(data, dealer_id):
+def put_dealer(data, dealer_id):
     request_url = backend_url+"/update_dealer/"+str(dealer_id)
     try:
         response = requests.put(request_url, data)
@@ -80,6 +80,16 @@ def post_dealer(data, dealer_id):
     except Exception as e:
         print(f"Network exception occurred: {e}")
         return {"error": "Network exception"}
+
+
+def post_dealer(data):
+    request_url = backend_url+"/new_dealer"
+    try:
+        response = requests.post(request_url, json=data)
+        print(response.json())
+        return response.json()
+    except Exception as e:
+        print(f"Network exception occurred: {e}")
 
 
 def post_review(data_dict):

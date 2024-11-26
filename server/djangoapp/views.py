@@ -8,8 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import CarMake, CarModel
 from .populate import initiate
 from .restapis import get_request, analyze_review_sentiments, \
-                    post_review, searchcars_request, post_dealer, \
-                    put_review
+                    post_review, searchcars_request, put_dealer, \
+                    put_review, post_dealer
 import openai
 import os
 
@@ -188,11 +188,31 @@ def edit_dealer(request, dealer_id):
         if request.method == 'PUT':
             data = json.loads(request.body)
             try:
-                response = post_dealer(data, dealer_id)
+                response = put_dealer(data, dealer_id)
                 return JsonResponse(response, status=200)
             except Exception as err:
                 print("Error editing dealer", err)
                 return JsonResponse({"message": "Error in Editing Dealer"},
+                                    status=401)
+        else:
+            print("method not allowed")
+            return JsonResponse({"message": "Method Not Allowed"}, status=405)
+    else:
+        return JsonResponse({"status": 403, "message": "No Access"},
+                            status=403)
+
+
+# Create a `New dealer` view to create a dealer
+def new_dealer(request):
+    if (request.user.is_anonymous is not False):
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            try:
+                response = post_dealer(data)
+                return JsonResponse(response, status=200)
+            except Exception as err:
+                print("Error creating dealer", err)
+                return JsonResponse({"message": "Error in creating Dealer"},
                                     status=401)
         else:
             print("method not allowed")
