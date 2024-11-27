@@ -152,8 +152,8 @@ app.put('/update_dealer/:id', express.json(), async (req, res) => {
 // Update dealer by id
 app.post('/new_dealer/', express.json(), async (req, res) => {
     try {
-        const { full_name, address, city, zip, state, st, lat, long, short_name } = req.body;
-        if (!full_name || !address || !city || !zip || !state || !st || !lat || !long || !short_name) {
+        const { full_name, address, city, zip, state, lat, long, short_name } = req.body;
+        if (!full_name || !address || !city || !zip || !state || !lat || !long || !short_name) {
             return res.status(400).json({ error: 'All fields are required.' });
         }
         const documents = await Dealerships.find().sort({ id: -1 });
@@ -166,7 +166,6 @@ app.post('/new_dealer/', express.json(), async (req, res) => {
             city,
             zip,
             state,
-            st, 
             lat,
             long,
             short_name

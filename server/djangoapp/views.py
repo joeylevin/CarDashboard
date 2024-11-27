@@ -204,22 +204,18 @@ def edit_dealer(request, dealer_id):
 
 # Create a `New dealer` view to create a dealer
 def new_dealer(request):
-    if (request.user.is_anonymous is not False):
-        if request.method == 'POST':
-            data = json.loads(request.body)
-            try:
-                response = post_dealer(data)
-                return JsonResponse(response, status=200)
-            except Exception as err:
-                print("Error creating dealer", err)
-                return JsonResponse({"message": "Error in creating Dealer"},
-                                    status=401)
-        else:
-            print("method not allowed")
-            return JsonResponse({"message": "Method Not Allowed"}, status=405)
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        try:
+            response = post_dealer(data)
+            return JsonResponse(response, status=200)
+        except Exception as err:
+            print("Error creating dealer", err)
+            return JsonResponse({"message": "Error in creating Dealer"},
+                                status=401)
     else:
-        return JsonResponse({"status": 403, "message": "No Access"},
-                            status=403)
+        print("method not allowed")
+        return JsonResponse({"message": "Method Not Allowed"}, status=405)
 
 
 # Create a `Edit Review` view to Change Review details
