@@ -14,11 +14,16 @@ import NotFound from "./components/Homepages/NotFound";
 import Header from "./components/Header/Header";
 import { UserProvider } from "./contexts/UserContext";
 import ChatBot from "./components/Chat/ChatBot";
+import { LoadScript } from "@react-google-maps/api";
 
 function App() {
     return (
         <DealerProvider>
             <UserProvider>
+            <LoadScript
+                googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} 
+                libraries={["places"]}
+                >
                 <div>
                     <Header />
                     <Routes>
@@ -37,6 +42,7 @@ function App() {
                     </Routes>
                     <ChatBot />
                 </div>
+                </LoadScript>
             </UserProvider>
         </DealerProvider>
     );

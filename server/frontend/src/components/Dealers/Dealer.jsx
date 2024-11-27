@@ -29,7 +29,7 @@ const Dealer = () => {
     const dealer_url = root_url + `djangoapp/dealer/${id}`;
     const reviews_url = root_url + `djangoapp/reviews/dealer/${id}`;
     const post_review = root_url + `postreview/${id}`;
-    const post_dealer = root_url + `editdealer/${id}`;
+    const put_dealer = root_url + `editdealer/${id}`;
 
     const get_dealer = async () => {
         try {
@@ -96,7 +96,7 @@ const Dealer = () => {
             <div style={{ marginTop: "10px" }}>
                 <h1 style={{ color: "grey" }}>{dealer.full_name} 
                     {allowedEdit ? (
-                        <a href={post_dealer}>
+                        <a href={put_dealer}>
                             <img src={edit_icon} style={{ width: '5%', marginLeft: '10px', marginTop: '10px' }} alt='Edit Dealer' />
                         </a>
                     ) : (
