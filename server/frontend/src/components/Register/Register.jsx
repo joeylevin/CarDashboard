@@ -18,6 +18,7 @@ import email_icon from "../assets/email.png"
 import password_icon from "../assets/password.png"
 import close_icon from "../assets/close.png"
 import { UserContext } from "../../contexts/UserContext";
+import NewDealer from "../Dealers/NewDealer";
 
 // Register component handles user registration for different user types.
 const Register = () => {
@@ -28,6 +29,7 @@ const Register = () => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [userType, setUserType] = useState("user");
+    const [showAddDealer, setShowAddDealer] = useState(false);
     const { dealers, loading, error } = useContext(DealerContext);
     const [dealer, setDealer] = useState(null); // Store selected dealer (if any)
     const [dealerList, setDealerList] = useState([]); // Store the list of dealers
@@ -116,6 +118,14 @@ const Register = () => {
         }
     };
 
+    const handleSaveDealer = (newDealerData) => {
+        setShowAddDealer(false); // Hide the form after saving
+        setDealer({
+            value: newDealerData.id,
+            label: `${newDealerData.short_name} - ${newDealerData.state}`,
+        })
+    };
+
     return (
         <div className="register_container" style={{ width: "50%" }}>
             <div className="header">
@@ -185,6 +195,7 @@ const Register = () => {
                             {loading ? (
                                 <p>Loading dealers...</p>
                             ) : (
+                                <div>
                                 <Select
                                     options={dealerList}
                                     value={dealer}
@@ -194,6 +205,17 @@ const Register = () => {
                                     placeholder="Search dealers..."
                                     getOptionLabel={(e) => e.label}
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAddDealer(true)}
+                                    className="add-dealer-button"
+                                >
+                                    Add New Dealer
+                                </button>
+                                {showAddDealer && (
+                                    <NewDealer onSave={handleSaveDealer}  />
+                                )}
+                                </div>
                             )}
                         </div>
                     )}
