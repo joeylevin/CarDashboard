@@ -14,11 +14,13 @@ import edit_icon from "../assets/edit.png"
 import { UserContext } from '../../contexts/UserContext';
 import { displayDistance } from '../../utils/helpers';
 import MapComponent from './Map';
+import NewDealer from './NewDealer';
 
 const Dealer = () => {
     const [dealer, setDealer] = useState({});
     const [reviews, setReviews] = useState([]);
     const [unreviewed, setUnreviewed] = useState(false);
+    const [editDealer, setEditDealer] = useState(false)
     const [distance, setDistance] = useState(null);
     const { currUser, getUserLocation, location } = useContext(UserContext);
     const navigate = useNavigate();
@@ -96,12 +98,16 @@ const Dealer = () => {
             <div style={{ marginTop: "10px" }}>
                 <h1 style={{ color: "grey" }}>{dealer.full_name} 
                     {allowedEdit ? (
-                        <a href={put_dealer}>
-                            <img src={edit_icon} style={{ width: '5%', marginLeft: '10px', marginTop: '10px' }} alt='Edit Dealer' />
-                        </a>
+                        <button 
+                            onClick={() => setEditDealer(!editDealer)}
+                            className="edit-button"
+                        >
+                            <img src={edit_icon}  alt='Edit Dealer' className="edit-button-icon" />
+                        </button>
                     ) : (
                         <></>
                     )}
+                    {editDealer && <NewDealer dealer={dealer} />}
                     {currUser.username ? (
                         <a href={post_review}>
                             <img src={review_icon} style={{ width: '10%', marginLeft: '10px', marginTop: '10px' }} alt='Post Review' />
