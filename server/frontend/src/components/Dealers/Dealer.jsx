@@ -68,6 +68,11 @@ const Dealer = () => {
         }
     }
 
+    const handleSaveDealer = (newDealerData) => {
+        setEditDealer(false); // Hide the form after saving
+        setDealer(newDealerData)
+    };
+
     const allowedEdit = ((currUser.user_type === "admin")
         || ((currUser.user_type === "dealer") && (currUser.dealer_id === id)));
 
@@ -107,7 +112,7 @@ const Dealer = () => {
                     ) : (
                         <></>
                     )}
-                    {editDealer && <NewDealer dealer={dealer} />}
+                    {editDealer && <NewDealer onSave={handleSaveDealer} dealer={dealer} />}
                     {currUser.username ? (
                         <a href={post_review}>
                             <img src={review_icon} style={{ width: '10%', marginLeft: '10px', marginTop: '10px' }} alt='Post Review' />

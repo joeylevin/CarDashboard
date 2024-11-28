@@ -1,20 +1,20 @@
-//  EditDealer.jsx
-//  This component allows admins to edit the details of a specific dealership.
+//  NewDealer.jsx
+//  This component allows admins to createa new dealership.
 //
-//  Fetches dealership data from the backend and pre-populates the form.
 //  Allows updating fields such as short name, full name, address, city, state, and zip code.
-//  Tracks changes and only submits modified fields to the backend.
-//  Sends a POST request to update the dealership details in the database.
-//  Redirects back to the dealership's page upon successful update.
+//  Sends a PUT request to update the dealership details in the database.
 //  Includes basic error handling for network issues or invalid responses.
+// Uses google placess to autocomplete the name
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import GooglePlacesAutocomplete, { geocodeByPlaceId }  from "react-google-places-autocomplete";
+import Toastify from 'toastify-js';
+import 'toastify-js/src/toastify.css';
 import "./Dealers.css";
 import "../assets/style.css";
 
 
-const NewDealer = ({ onSave }) => {
+const NewDealer = ({ onSave, dealer }) => {
     const [addressDetails, setAddressDetails] = useState({
         address: "",
         city: "",
@@ -22,13 +22,39 @@ const NewDealer = ({ onSave }) => {
         lat: "",
         long: "",
     });
+    const [originalData, setOriginalData] = useState({})
+    // TODO: check before updating
     const [shortName, setShortName] = useState("");
+    // TODO: add shortname using long name
     const [fullName, setFullName] = useState("");
 
+    // Determine the appropriate endpoint based on the mode
+    const baseApiUrl = `${window.location.origin}/djangoapp`;
+    const dealer_url = dealer ? `${baseApiUrl}/edit_dealer/${dealer.id}` : `${baseApiUrl}/new_dealer`;
 
-    let curr_url = window.location.href;
-    let root_url = curr_url.substring(0, curr_url.indexOf("editdealer"));
-    let dealer_url = root_url + `djangoapp/new_dealer`
+    const headerText = dealer ? "Edit Dealer" : "Add New Dealer";
+
+    useEffect(() => {
+        if (dealer) {
+            setAddressDetails({
+                address: dealer.address || "",
+                city: dealer.city || "",
+                zip: dealer.zip || "",
+                state: dealer.state || "",
+                lat: dealer.lat || "",
+                long: dealer.long || "",
+            });
+            setOriginalData({
+                address: dealer.address || "",
+                city: dealer.city || "",
+                zip: dealer.zip || "",
+                state: dealer.state || "",
+                lat: dealer.lat || "",
+                long: dealer.long || "",
+            });
+            setFullName(dealer.full_name || "");
+        }
+    }, [dealer]);
 
     const submitDealer = async (e) => {
         e.preventDefault()
@@ -43,8 +69,10 @@ const NewDealer = ({ onSave }) => {
             return;
         }
 
+        const method = dealer ? 'PUT' : 'POST'
+
         const res = await fetch(dealer_url, {
-            method: "POST",
+            method,
             headers: {
                 "Content-Type": "application/json",
             },
@@ -57,8 +85,14 @@ const NewDealer = ({ onSave }) => {
             return;
         }
         const result = await res.json();
-        alert('Dealer saved successfully!');
-        if (onSave) onSave(result);
+        Toastify({
+            text: dealer ? "Dealer saved successfully" : "Dealer created successfully!",
+            duration: 5000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "linear-gradient(to right, #4CAF50, #43A047)",
+        }).showToast();
+        if (onSave) onSave(updatedData);
 
     }
 
@@ -93,7 +127,7 @@ const NewDealer = ({ onSave }) => {
 
     return (
         <div style={{ margin: "5%" }}>
-            <h2>Add a New Dealer</h2>
+            <h2>{headerText}</h2>
                 <div className="input_field">
                     <label htmlFor="fullName">Full Name</label>
                     <input
@@ -112,6 +146,7 @@ const NewDealer = ({ onSave }) => {
                         selectProps={{
                             onChange: (place) => extractAddressComponents(place),
                             placeholder: "Search address...",
+                            value: { label: addressDetails.address, value: addressDetails.address }
                         }}
                     />
                 </div>
@@ -149,7 +184,9 @@ const NewDealer = ({ onSave }) => {
                 <button
                     type="button"
                     className="postreview"
-                    onClick={() => alert("Canceled")}
+                    onClick={() => {
+                        if (onSave) onSave();
+                    }}
                 >
                     Cancel
                 </button>

@@ -30,10 +30,19 @@ table{
   }
 
   .postreview{
-    margin:20px;
-    padding:10px;
-    font-size: larger;
+    margin:20px;    
+    padding: 8px 16px; /* Adjust padding to make the button smaller */
+    font-size: 14px;   /* Decrease font size */
+    border-radius: 5px; /* Optional: make corners slightly rounded */
+    background-color: #007bff; /* Adjust background color as needed */
+    color: white;
+    border: none;
+    cursor: pointer;
   }
+
+  .postreview:hover {
+    background-color: #0056b3; /* Darken color on hover */
+}
 
   th{
     padding:5px;

@@ -6,7 +6,6 @@ import Dealer from "./components/Dealers/Dealer"
 import PostReview from "./components/Dealers/PostReview"
 import SearchCars from "./components/Dealers/SearchCars";
 import Home from "./components/Homepages/Home"
-import EditDealer from "./components/Dealers/EditDealer";
 import About from "./components/Homepages/About";
 import Contact from "./components/Homepages/Contact";
 import DealerProvider from './contexts/DealerContext';
@@ -36,7 +35,6 @@ function App() {
                         <Route path="/dealer/:id" element={<Dealer />} />
                         <Route path="/postreview/:id" element={<PostReview />} />
                         <Route path="/postreview/:id/:reviewid" element={<PostReview />} />
-                        <Route path="/editdealer/:id" element={<EditDealer />} />
                         <Route path="/searchcars/:id" element={<SearchCars />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>
