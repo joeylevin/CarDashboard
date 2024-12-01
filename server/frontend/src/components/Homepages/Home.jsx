@@ -11,6 +11,7 @@ const Home = () => {
                     <div className="banner">
                         <h5>Welcome to our Dealerships!</h5>
                         <a href="/dealers" className="btn" style={{ backgroundColor: 'plum', margin: '10px' }}>View Dealerships</a>
+                        <a href="/cars" className="btn" style={{ backgroundColor: 'plum', margin: '10px' }}>View Cars</a>
                     </div>
                 </div>
             </div>

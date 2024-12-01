@@ -14,6 +14,7 @@ import Header from "./components/Header/Header";
 import { UserProvider } from "./contexts/UserContext";
 import ChatBot from "./components/Chat/ChatBot";
 import { LoadScript } from "@react-google-maps/api";
+import CarList from "./components/CarList/CarList";
 
 function App() {
     return (
@@ -36,6 +37,7 @@ function App() {
                         <Route path="/postreview/:id" element={<PostReview />} />
                         <Route path="/postreview/:id/:reviewid" element={<PostReview />} />
                         <Route path="/searchcars/:id" element={<SearchCars />} />
+                        <Route path="/cars/" element={<CarList />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>
                     <ChatBot />
