@@ -256,6 +256,28 @@ def get_inventory(request, dealer_id):
         return JsonResponse({"status": 400, "message": "Bad Request"})
 
 
+def full_inventory(request):
+    data = request.GET
+    if 'year' in data:
+        endpoint = f"/carsbyyear/{data['year']}"
+    elif 'make' in data:
+        endpoint = f"/inventorybymake/{data['make']}"
+    elif 'model' in data:
+        endpoint = f"/inventorybymodel/{data['model']}"
+    elif 'mileage' in data:
+        endpoint = f"/inventorybymaxmileage/{data['mileage']}"
+    elif 'price' in data:
+        endpoint = f"/inventorybyprice/{data['price']}"
+    else:
+        endpoint = "/inventory/"
+
+    try:
+        cars = searchcars_request(endpoint)
+        return JsonResponse({"status": 200, "cars": cars})
+    except Exception as e:
+        return JsonResponse({"status": 500, "error": str(e)})
+
+
 def chat_view(request):
     if request.method == 'POST':
         body = json.loads(request.body)
