@@ -1,16 +1,18 @@
-// SearchCars.jsx
+// CarList.jsx
 //
-// This component displays a list of cars available at a specific dealer, 
+// This component displays all cars available,
 // fetched from the backend API. Users can filter cars by various criteria 
 // such as make, model, year, mileage, and price. It includes options to 
 // reset filters and dynamically updates the displayed cars based on user input.
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import '../Dealers/SearchCars.css';
+import { DealerContext } from '../../contexts/DealerContext';
 
 const CarList = () => {
     const [cars, setCars] = useState([]);
     const [makes, setMakes] = useState([]);
     const [models, setModels] = useState([]);
+    const { dealers } = useContext(DealerContext);
     const [message, setMessage] = useState("Loading Cars....");
 
     let dealer_url = `/djangoapp/full_inventory`;
@@ -127,6 +129,11 @@ const CarList = () => {
         if (retobj.status === 200) {
             setCarsmatchingCriteria(retobj.cars);
         }
+    }
+
+    let carLocation = (dealerID) => {
+        const cur = dealers[dealerID];
+        return cur.city+', '+cur.state+' '+cur.zip
     }
 
     let SearchCarsByModel = async () => {
@@ -307,6 +314,7 @@ const CarList = () => {
                                     <p>Year: {car.year}</p>
                                     <p>Mileage: {car.mileage}</p>
                                     <p>Price: {car.price}</p>
+                                    <p>Location: {carLocation(car.dealer_id)}</p>
                                 </div>
                                 <hr />
                             </div>
