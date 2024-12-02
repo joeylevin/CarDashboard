@@ -73,8 +73,18 @@ app.get('/', async (req, res) => {
 // Get cars by dealer ID
 app.get('/inventory/', async (req, res) => {
     try {
-        const documents = await Cars.find();
-        res.json(documents);
+        const page = parseInt(req.query.page) || 1; // Default to page 1
+        const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+        const skip = (page - 1) * limit;
+        const totalCars = await Cars.countDocuments(); // Total number of cars
+        const cars = await Cars.find().skip(skip).limit(limit);
+        res.json({
+            status: 200,
+            cars,
+            totalCars,
+            totalPages: Math.ceil(totalCars / limit),
+            currentPage: page
+        });
     } catch (error) {
         res.status(500).json({ error: 'Error fetching all cars' });
     }
