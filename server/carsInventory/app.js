@@ -107,58 +107,6 @@ app.get('/inventory/', async (req, res) => {
     }
 });
 
-// Get all cars by make
-app.get('/inventorybymake/:make', async (req, res) => {
-    try {
-        const documents = await Cars.find({ make: req.params.make });
-        res.json(documents);
-    } catch (error) {
-        res.status(500).json({ error: 'Error fetching all cars by make' });
-    }
-});
-
-// Get all cars by model
-app.get('/inventorybymodel/:model', async (req, res) => {
-    try {
-        const documents = await Cars.find({ model: req.params.model });
-        res.json(documents);
-    } catch (error) {
-        res.status(500).json({ error: 'Error fetching all cars by model' });
-    }
-});
-
-// Get all cars by max mileage range
-app.get('/inventorybymaxmileage/:mileage', async (req, res) => {
-    try {
-        const mileage = parseInt(req.params.mileage)
-        const documents = await Cars.find({ mileage: getMileageCondition(mileage) });
-        res.json(documents);
-    } catch (error) {
-        res.status(500).json({ error: 'Error fetching all cars by max mileage' });
-    }
-});
-
-// Get all cars by price range
-app.get('/inventorybyprice/:price', async (req, res) => {
-    try {
-        const price = parseInt(req.params.price)
-        const documents = await Cars.find({ price: getPriceCondition(price) });
-        res.json(documents);
-    } catch (error) {
-        res.status(500).json({ error: 'Error fetching all cars by price range' });
-    }
-});
-
-// Get all cars by minimum year
-app.get('/carsbyyear/:year', async (req, res) => {
-    try {
-        const documents = await Cars.find({ year: { $gte: req.params.year } });
-        res.json(documents);
-    } catch (error) {
-        res.status(500).json({ error: 'Error fetching all cars by minimum year' });
-    }
-});
-
 // Get cars by dealer ID
 app.get('/cars/:id', async (req, res) => {
     try {
