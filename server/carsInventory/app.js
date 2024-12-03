@@ -70,20 +70,37 @@ app.get('/', async (req, res) => {
     res.send('Welcome to the Car Inventory DB');
 });
 
-// Get cars by dealer ID
+// Get cars
 app.get('/inventory/', async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1; // Default to page 1
-        const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
-        const skip = (page - 1) * limit;
-        const totalCars = await Cars.countDocuments(); // Total number of cars
-        const cars = await Cars.find().skip(skip).limit(limit);
+        const { make, model, year, mileageMin, mileageMax, priceMin, priceMax, page = 1, limit = 10 } = req.query;
+
+        const filters = {};
+
+        if (make) {
+            filters.make = make;
+        }
+        if (model) {
+            filters.model = model;
+        }
+        if (year) {
+            filters.year = { $gte: parseInt(year) }; // Cars from this year or newer
+        }
+        if (mileageMin && mileageMax) {
+            filters.mileage = { $gte: parseInt(mileageMin), $lte: parseInt(mileageMax) };
+        }
+        if (priceMin && priceMax) {
+            filters.price = { $gte: parseInt(priceMin), $lte: parseInt(priceMax) };
+        }
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const totalCars = await Cars.countDocuments(filters);
+        const cars = await Cars.find(filters).skip(skip).limit(parseInt(limit));
         res.json({
             status: 200,
             cars,
             totalCars,
             totalPages: Math.ceil(totalCars / limit),
-            currentPage: page
+            currentPage: parseInt(page)
         });
     } catch (error) {
         res.status(500).json({ error: 'Error fetching all cars' });

@@ -14,11 +14,13 @@ const CarSchema = new Schema({
     },
     make: {
         type: String,
-        required: true
+        required: true,
+        index: true 
     },
     model: {
         type: String,
-        required: true
+        required: true,
+        index: true 
     },
     bodyType: {
         type: String,
@@ -27,18 +29,26 @@ const CarSchema = new Schema({
     year: {
         type: Number,
         required: true,
-        min: 1886
+        min: 1886,
+        index: true 
     },
     mileage: {
         type: Number,
         required: true,
-        min: 0
+        min: 0,
+        index: true 
     },
     price: {
         type: Number,
         required: true,
-        min: 0
+        min: 0,
+        index: true 
     }
 });
+
+CarSchema.index({ make: 1, model: 1, year: 1, mileage: 1, price: 1 });
+CarSchema.index({ make: 1, model: 1, price: 1 });
+CarSchema.index({ mileage: 1, year: 1 });
+
 
 module.exports = mongoose.model('cars', CarSchema);
