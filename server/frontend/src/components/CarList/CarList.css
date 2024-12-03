@@ -1,0 +1,88 @@
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pagination-controls button {
+    margin: 0 10px;
+    padding: 5px 10px;
+}
+
+.pagination-controls span {
+    font-size: 16px;
+}
+
+.slider-values {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.slider-values span {
+    margin: 0 5px;
+}
+
+.reset-button {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #0066ff;
+    border: none;
+    cursor: pointer;
+}
+
+.reset-button:hover {
+    background-color: #e0e0e0;
+}
+
+.reset-button:active {
+    background-color: #d0d0d0;
+}
+
+.range-track {
+    height: 36px;
+    display: flex;
+    width: 100%;
+  }
+  
+  /* Track background */
+  .range-track-background {
+    height: 5px;
+    width: 100%;
+    border-radius: 4px;
+    background: #ccc;
+    align-self: center;
+  }
+  
+  /* Thumb container */
+  .range-thumb {
+    height: 42px;
+    width: 42px;
+    border-radius: 4px;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 2px 6px #aaa;
+  }
+  
+  /* Thumb indicator */
+  .range-thumb-indicator {
+    height: 16px;
+    width: 5px;
+    background-color: #ccc;
+  }
+  
+  /* Thumb when dragged */
+  .range-thumb.dragged .range-thumb-indicator {
+    background-color: #548BF4;
+  }
+  
+  /* Slider track colors when active */
+  .range-track-background {
+    background: #ccc;
+    transition: background 0.3s ease;
+  }
+  
+  .range-track-background[data-background="active"] {
+    background: #548BF4;
+  }

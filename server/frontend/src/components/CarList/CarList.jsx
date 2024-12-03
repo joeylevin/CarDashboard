@@ -6,7 +6,9 @@
 // reset filters and dynamically updates the displayed cars based on user input.
 import React, { useState, useEffect, useContext } from 'react';
 import '../Dealers/SearchCars.css';
+import './CarList.css';
 import { DealerContext } from '../../contexts/DealerContext';
+import RangeSlider from './RangeSlider';
 
 const CarList = () => {
     const [cars, setCars] = useState([]);
@@ -14,222 +16,136 @@ const CarList = () => {
     const [models, setModels] = useState([]);
     const { dealers } = useContext(DealerContext);
     const [message, setMessage] = useState("Loading Cars....");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [filters, setFilters] = useState({
+        mileage: [0, 200000],
+        price: [0, 100000],
+        make: 'all',
+        model: 'all',
+        year: 'all',
+    });
+
+    const [limit, setLimit] = useState(10)
+    const [resetSlider, setResetSlider] = useState(false);
 
     let dealer_url = `/djangoapp/full_inventory`;
 
 
-    const fetchCars = async () => {
+    const fetchCars = async (page = 1) => {
         try {
-            const res = await fetch(dealer_url, {
-                method: "GET"
-            });
+            const queryParams = new URLSearchParams({ page, limit });
+            if (filters.mileage[0] !== 0 || filters.mileage[1] !== 200000) {
+                queryParams.append('mileageMin', filters.mileage[0])
+                queryParams.append('mileageMax', filters.mileage[1]);
+            }
+            if (filters.price[0] !== 0 || filters.price[1] !== 100000) {
+                queryParams.append('priceMin', filters.price[0]);
+                queryParams.append('priceMax', filters.price[1]);
+            }
+            if (filters.make !== 'all') queryParams.append('make', filters.make);
+            if (filters.model !== 'all') queryParams.append('model', filters.model);
+            if (filters.year !== 'all') queryParams.append('year', filters.year);
+
+            const res = await fetch(`${dealer_url}?${queryParams.toString()}`, { method: "GET" });
+
             const retobj = await res.json();
 
             if (retobj.status === 200) {
-                let cars = Array.from(retobj.cars)
-                setCars(cars);
-                populateMakesAndModels(cars);
+                if (!Array.isArray(retobj.cars) || retobj.cars.length === 0) {
+                    setCars(retobj.cars);
+                    setMessage("No cars found.");
+                    setCurrentPage(1);
+                    setTotalPages(1);
+                    setMakes([]); // Clear makes if no cars are provided
+                    setModels([]); // Clear models if no cars are provided
+                }
+                else {
+                    setCars(retobj.cars);
+                    setTotalPages(retobj.totalPages);
+                    setCurrentPage(retobj.currentPage);
+                    populateMakesAndModels(retobj.cars);
+                }
+            }
+            else {
+                setMessage("No cars found.");
             }
         } catch (err) {
             console.error("Error fetching cars", err)
+            setMessage("Error loading cars.");
         }
     }
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+    
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
 
     const populateMakesAndModels = (cars) => {
-        let tmpmakes = []
-        let tmpmodels = []
-        cars.forEach((car) => {
-            tmpmakes.push(car.make)
-            tmpmodels.push(car.model)
-        })
-        setMakes(Array.from(new Set(tmpmakes)));
-        setModels(Array.from(new Set(tmpmodels)));
+        const tmpMakes = new Set(cars.map(car => car.make));
+        const tmpModels = new Set(cars.map(car => car.model));
+        setMakes([...tmpMakes]);
+        setModels([...tmpModels]);
     }
 
-    const setCarsmatchingCriteria = async (matching_cars) => {
-        let cars = Array.from(matching_cars)
-
-        let makeIdx = document.getElementById('make').selectedIndex;
-        let modelIdx = document.getElementById('model').selectedIndex;
-        let yearIdx = document.getElementById('year').selectedIndex;
-        let mileageIdx = document.getElementById('mileage').selectedIndex;
-        let priceIdx = document.getElementById('price').selectedIndex;
-
-        if (makeIdx !== 0) {
-            let currmake = document.getElementById('make').value;
-            cars = cars.filter(car => car.make === currmake);
-        }
-        if (modelIdx !== 0) {
-            let currmodel = document.getElementById('model').value;
-            cars = cars.filter(car => car.model === currmodel);
-            if (cars.length !== 0) {
-                document.getElementById('make').value = cars[0].make;
-            }
-        }
-
-        if (yearIdx !== 0) {
-            let curryear = document.getElementById('year').value;
-            cars = cars.filter(car => car.year >= curryear);
-            if (cars.length !== 0) {
-                document.getElementById('make').value = cars[0].make;
-            }
-        }
-
-        if (mileageIdx !== 0) {
-            let currmileage = parseInt(document.getElementById('mileage').value);
-            if (currmileage === 50000) {
-                cars = cars.filter(car => car.mileage <= currmileage);
-            } else if (currmileage === 100000) {
-                cars = cars.filter(car => car.mileage <= currmileage && car.mileage > 50000);
-            } else if (currmileage === 150000) {
-                cars = cars.filter(car => car.mileage <= currmileage && car.mileage > 100000);
-            } else if (currmileage === 200000) {
-                cars = cars.filter(car => car.mileage <= currmileage && car.mileage > 150000);
-            } else {
-                cars = cars.filter(car => car.mileage > 200000);
-            }
-        }
-
-        if (priceIdx !== 0) {
-            let currprice = parseInt(document.getElementById('price').value);
-            if (currprice === 20000) {
-                cars = cars.filter(car => car.price <= currprice);
-            } else if (currprice === 40000) {
-                cars = cars.filter(car => car.price <= currprice && car.price > 20000);
-            } else if (currprice === 60000) {
-                cars = cars.filter(car => car.price <= currprice && car.price > 40000);
-            } else if (currprice === 80000) {
-                cars = cars.filter(car => car.price <= currprice && car.price > 60000);
-            } else {
-                cars = cars.filter(car => car.price > 80000);
-            }
-        }
-
-        if (cars.length === 0) {
-            setMessage("No cars found matching criteria");
-        }
-        setCars(cars);
-    }
-
-
-    let SearchCarsByMake = async () => {
-        let make = document.getElementById("make").value;
-        if (make !== "all") {
-            dealer_url = dealer_url + "?make=" + make;
-        }
-        const res = await fetch(dealer_url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-
-        const retobj = await res.json();
-
-        if (retobj.status === 200) {
-            setCarsmatchingCriteria(retobj.cars);
-        }
-    }
 
     let carLocation = (dealerID) => {
         const cur = dealers[dealerID];
         return cur.city+', '+cur.state+' '+cur.zip
     }
 
-    let SearchCarsByModel = async () => {
-        let model = document.getElementById("model").value;
-        if (model !== "all") {
-            dealer_url = dealer_url + "?model=" + model;
-        }
-
-        const res = await fetch(dealer_url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-
-        const retobj = await res.json();
-
-        if (retobj.status === 200) {
-            setCarsmatchingCriteria(retobj.cars);
-        }
-    }
-
-    let SearchCarsByYear = async () => {
-        let year = document.getElementById("year").value;
-        if (year !== "all") {
-            dealer_url = dealer_url + "?year=" + year;
-        }
-
-        const res = await fetch(dealer_url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-
-        const retobj = await res.json();
-
-        if (retobj.status === 200) {
-            setCarsmatchingCriteria(retobj.cars);
-        }
-    }
-
-    let SearchCarsByMileage = async () => {
-        let mileage = document.getElementById("mileage").value;
-        if (mileage !== "all") {
-            dealer_url = dealer_url + "?mileage=" + mileage;
-        }
-
-        const res = await fetch(dealer_url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-
-        const retobj = await res.json();
-
-        if (retobj.status === 200) {
-            setCarsmatchingCriteria(retobj.cars);
-        }
-    }
-
-
-    let SearchCarsByPrice = async () => {
-        let price = document.getElementById("price").value;
-        if (price !== "all") {
-            dealer_url = dealer_url + "?price=" + price;
-        }
-
-        const res = await fetch(dealer_url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-
-        const retobj = await res.json();
-
-        if (retobj.status === 200) {
-            setCarsmatchingCriteria(retobj.cars);
-        }
+    const filtersChanged = () => {
+        if (filters.mileage[0] !== 0 
+            || filters.mileage[1] !== 200000
+            || filters.price[0] !== 0
+            || filters.price[1] !== 100000
+            || filters.make !== 'all'
+            || filters.model !== 'all'
+            || filters.year !== 'all')
+                return true;
+        else return false;
     }
 
     const reset = () => {
-        const selectElements = document.querySelectorAll('select');
-
-        selectElements.forEach((select) => {
-            select.selectedIndex = 0;
-        });
-        fetchCars();
+        if (filtersChanged()) {
+            setFilters({
+                mileage: [0, 200000],
+                price: [0, 100000],
+                make: 'all',
+                model: 'all',
+                year: 'all',
+            });
+            setCurrentPage(1);
+            setResetSlider(true); // Trigger reset in RangeSlider
+            setTimeout(() => setResetSlider(false), 0);
+        }
     }
 
+    const handleFilterChange = (e) => {
+        const { id, value } = e.target;
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            [id]: value,
+        }));
+    };
+
+    const handleRangeChange = (newValues, type) => {
+        setFilters(prevFilters => ({
+            ...prevFilters,
+            [type]: newValues,
+        }));
+    };
 
     useEffect(() => {
-        fetchCars();
-    }, []);
+        fetchCars(currentPage);
+    }, [filters, currentPage]);
 
     return (
         <div>
@@ -237,12 +153,12 @@ const CarList = () => {
             <div>
                 <div className="filters-container">
                     <label className="filter-label">Make</label>
-                    <select className="filter-select" id="make" onChange={SearchCarsByMake}>
+                    <select className="filter-select" id="make" value={filters.make} onChange={handleFilterChange}>
                         {makes.length === 0 ? (
                             <option value=''>No data found</option>
                         ) : (
                             <>
-                                <option defaultValue value='all'> -- All -- </option>
+                                <option value="all"> -- All -- </option>
                                 {makes.map((make, index) => (
                                     <option key={index} value={make}>
                                         {make}
@@ -253,12 +169,12 @@ const CarList = () => {
                         }
                     </select>
                     <label className="filter-label">Model</label>
-                    <select className="filter-select" id="model" onChange={SearchCarsByModel}>
+                    <select className="filter-select" id="model" value={filters.model} onChange={handleFilterChange}>
                         {models.length === 0 ? (
                             <option value=''>No data found</option>
                         ) : (
                             <>
-                                <option defaultValue value='all'> -- All -- </option>
+                                <option value='all'> -- All -- </option>
                                 {models.map((model, index) => (
                                     <option key={index} value={model}>
                                         {model}
@@ -268,7 +184,7 @@ const CarList = () => {
                         )}
                     </select>
                     <label className="filter-label">Year</label>
-                    <select className="filter-select" id="year" onChange={SearchCarsByYear}>
+                    <select className="filter-select" id="year" value={filters.year} onChange={handleFilterChange}>
                         <option selected value='all'> -- All -- </option>
                         <option value='2024'>2024 or newer</option>
                         <option value='2023'>2023 or newer</option>
@@ -276,28 +192,31 @@ const CarList = () => {
                         <option value='2021'>2021 or newer</option>
                         <option value='2020'>2020 or newer</option>
                     </select>
-                    <label className="filter-label">Mileage</label>
-                    <select className="filter-select" id="mileage" onChange={SearchCarsByMileage}>
-                        <option selected value='all'> -- All -- </option>
-                        <option value='50000'>Under 50000</option>
-                        <option value='100000'>50000 - 100000</option>
-                        <option value='150000'>100000 - 150000</option>
-                        <option value='200000'>150000 - 200000</option>
-                        <option value='200001'>Over 200000</option>
-                    </select>
-                    <label className="filter-label">Price</label>
-                    <select className="filter-select" name="price" id="price" onChange={SearchCarsByPrice}>
-                        <option selected value='all'> -- All -- </option>
-                        <option value='20000'>Under 20000</option>
-                        <option value='40000'>20000 - 40000</option>
-                        <option value='60000'>40000 - 60000</option>
-                        <option value='80000'>60000 - 80000</option>
-                        <option value='80001'>Over 80000</option>
-                    </select>
+                    <label for="mileage" className="filter-label">Mileage</label>
+                    <RangeSlider 
+                        values={filters.mileage} 
+                        onFinalChange={(newVal) => handleRangeChange(newVal, 'mileage')}
+                        min={0} 
+                        max={200000} 
+                        step={2500} 
+                        className="mileage-slider" 
+                        label="Mileage" 
+                        reset={resetSlider}
+                    />
 
+                    <label for="price" className="filter-label">Price</label>
+                    <RangeSlider 
+                        values={filters.price} 
+                        onFinalChange={(newPrice) => handleRangeChange(newPrice, 'price')}
+                        min={0} 
+                        max={100000} 
+                        step={1000} 
+                        className="price-slider" 
+                        label="Price" 
+                        reset={resetSlider}
+                    />
                     <button className="reset-button" onClick={reset}>Reset</button>
                 </div>
-
             </div>
 
 
@@ -323,6 +242,19 @@ const CarList = () => {
 
                     </div>
                 )}
+            </div>
+            <div className="pagination-controls">
+                <button 
+                    onClick={handlePreviousPage} 
+                    disabled={currentPage === 1}>
+                    Previous
+                </button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <button 
+                    onClick={handleNextPage} 
+                    disabled={currentPage === totalPages}>
+                    Next
+                </button>
             </div>
         </div>
     );
