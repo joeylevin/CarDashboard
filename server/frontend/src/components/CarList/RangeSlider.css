@@ -1,0 +1,56 @@
+/* Container for the range slider */
+.range-slider-container {
+    margin-bottom: 20px; /* Adds spacing between the slider and other elements */
+}
+
+/* Label styling for the range slider */
+.range-slider-label {
+    font-weight: bold;    /* Makes the label text bold */
+    margin-bottom: 5px;   /* Adds space between the label and the slider */
+}
+
+/* Styling for the track of the range slider */
+.range-track {
+    height: 36px;         /* Sets the height of the slider track */
+    display: flex;        /* Ensures the track is flexible */
+    width: 100%;          /* Makes the track span the full width of the container */
+}
+
+/* Background of the slider track */
+.range-track-background {
+    height: 5px;          /* Sets the height of the track background */
+    width: 100%;          /* Makes the background span the entire track */
+    border-radius: 4px;   /* Rounds the corners of the track */
+    background: #ccc;     /* Sets the default background color */
+    align-self: center;   /* Centers the track vertically */
+}
+
+/* Styling for the slider thumb */
+.range-thumb {
+    height: 42px;         /* Sets the height of the thumb */
+    width: 42px;          /* Sets the width of the thumb */
+    border-radius: 4px;   /* Rounds the corners of the thumb */
+    background-color: #fff; /* Sets the background color of the thumb */
+    display: flex;        /* Makes the thumb a flex container */
+    justify-content: center; /* Centers the thumb content */
+    align-items: center;  /* Aligns the thumb content vertically */
+    box-shadow: 0px 2px 6px #aaa; /* Adds a shadow effect to the thumb */
+}
+
+/* Styling for the thumb indicator (small part of the thumb) */
+.range-thumb-indicator {
+    height: 16px;         /* Sets the height of the indicator */
+    width: 5px;           /* Sets the width of the indicator */
+    background-color: #ccc; /* Sets the default color of the indicator */
+}
+
+/* Styling for the thumb indicator when it is being dragged */
+.range-thumb.dragged .range-thumb-indicator {
+    background-color: #548BF4; /* Changes the indicator color when dragged */
+}
+
+/* Styling for displaying the selected values of the range slider */
+.slider-values {
+    margin-top: 10px;    /* Adds space above the values */
+    font-size: 14px;     /* Sets the font size for the values */
+}
