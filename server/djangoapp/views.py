@@ -258,22 +258,43 @@ def get_inventory(request, dealer_id):
 
 def full_inventory(request):
     data = request.GET
-    if 'year' in data:
-        endpoint = f"/carsbyyear/{data['year']}"
-    elif 'make' in data:
-        endpoint = f"/inventorybymake/{data['make']}"
-    elif 'model' in data:
-        endpoint = f"/inventorybymodel/{data['model']}"
-    elif 'mileage' in data:
-        endpoint = f"/inventorybymaxmileage/{data['mileage']}"
-    elif 'price' in data:
-        endpoint = f"/inventorybyprice/{data['price']}"
-    else:
-        endpoint = "/inventory/"
+    endpoint = "/inventory/"
 
     try:
-        cars = searchcars_request(endpoint)
-        return JsonResponse({"status": 200, "cars": cars})
+        page = data.get('page', 1)  # Default to page 1 if not provided
+        limit = data.get('per_page', 10)  # Default to 10 if not provided
+        mileage_min = data.get('mileageMin')
+        mileage_max = data.get('mileageMax')
+        price_min = data.get('priceMin')
+        price_max = data.get('priceMax')
+        make = data.get('make')
+        model = data.get('model')
+        year = data.get('year')
+
+        # Build filter parameters to pass to searchcars_request
+        filters = {}
+        if mileage_min is not None and mileage_max is not None:
+            filters['mileageMin'] = mileage_min
+            filters['mileageMax'] = mileage_max
+        if price_min is not None and price_max is not None:
+            filters['priceMin'] = price_min
+            filters['priceMax'] = price_max
+        if make is not None:
+            filters['make'] = make
+        if model is not None:
+            filters['model'] = model
+        if year is not None:
+            filters['year'] = year
+
+        cars = searchcars_request(endpoint,
+                                  page=str(page),
+                                  limit=str(limit),
+                                  **filters)
+        return JsonResponse({"status": 200,
+                             "cars": cars['cars'],
+                             "total": cars['totalCars'],
+                             "currentPage": cars['currentPage'],
+                             "totalPages": cars['totalPages']})
     except Exception as e:
         return JsonResponse({"status": 500, "error": str(e)})
 

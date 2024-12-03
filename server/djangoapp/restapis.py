@@ -41,9 +41,8 @@ def searchcars_request(endpoint, **kwargs):
     params = ""
     if (kwargs):
         for key, value in kwargs.items():
-            params = params+key + "=" + value + "&"
-
-    request_url = searchcars_url+endpoint+"?"+params
+            params += f"{key}={value}&"
+    request_url = searchcars_url + endpoint + "?" + params.rstrip('&')
 
     print("GET from {} ".format(request_url))
     try:
