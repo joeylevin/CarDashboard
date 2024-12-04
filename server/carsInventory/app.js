@@ -7,6 +7,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const port = 3050;
@@ -41,6 +42,15 @@ async function initializeData() {
     }
 }
 
+// Rate limiting middleware
+const getLimiter = rateLimit({
+    windowMs: 30 * 1000, // 30 second window
+    max: 30, // Limit each IP to 30 requests per windowMs
+    message: { error: "Too many requests, please try again later" },
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
 async function startServer() {
     await connectDatabase(); // Wait until the database connection is established
 };
@@ -66,12 +76,12 @@ function getPriceCondition(price) {
 // Routes
 
 // Basic route
-app.get('/', async (req, res) => {
+app.get('/', getLimiter, async (req, res) => {
     res.send('Welcome to the Car Inventory DB');
 });
 
 // Get cars
-app.get('/inventory/', async (req, res) => {
+app.get('/inventory/', getLimiter, async (req, res) => {
     try {
         const { make, model, year, mileageMin, mileageMax, priceMin, priceMax, page = 1, limit = 10 } = req.query;
 
@@ -108,7 +118,7 @@ app.get('/inventory/', async (req, res) => {
 });
 
 // Get cars by dealer ID
-app.get('/cars/:id', async (req, res) => {
+app.get('/cars/:id', getLimiter, async (req, res) => {
     try {
         const documents = await Cars.find({ dealer_id: req.params.id });
         res.json(documents);
@@ -118,7 +128,7 @@ app.get('/cars/:id', async (req, res) => {
 });
 
 // Get cars by dealer ID and make
-app.get('/carsbymake/:id/:make', async (req, res) => {
+app.get('/carsbymake/:id/:make', getLimiter, async (req, res) => {
     try {
         const documents = await Cars.find({ dealer_id: req.params.id, make: req.params.make });
         res.json(documents);
@@ -128,7 +138,7 @@ app.get('/carsbymake/:id/:make', async (req, res) => {
 });
 
 // Get cars by dealer ID and model
-app.get('/carsbymodel/:id/:model', async (req, res) => {
+app.get('/carsbymodel/:id/:model', getLimiter, async (req, res) => {
     try {
         const documents = await Cars.find({ dealer_id: req.params.id, model: req.params.model });
         res.json(documents);
@@ -138,7 +148,7 @@ app.get('/carsbymodel/:id/:model', async (req, res) => {
 });
 
 // Get cars by dealer ID and max mileage range
-app.get('/carsbymaxmileage/:id/:mileage', async (req, res) => {
+app.get('/carsbymaxmileage/:id/:mileage', getLimiter, async (req, res) => {
     try {
         const mileage = parseInt(req.params.mileage)
         const documents = await Cars.find({ dealer_id: req.params.id, mileage: getMileageCondition(mileage) });
@@ -149,7 +159,7 @@ app.get('/carsbymaxmileage/:id/:mileage', async (req, res) => {
 });
 
 // Get cars by dealer ID and price range
-app.get('/carsbyprice/:id/:price', async (req, res) => {
+app.get('/carsbyprice/:id/:price', getLimiter, async (req, res) => {
     try {
         const price = parseInt(req.params.price)
         const documents = await Cars.find({ dealer_id: req.params.id, price: getPriceCondition(price) });
@@ -160,7 +170,7 @@ app.get('/carsbyprice/:id/:price', async (req, res) => {
 });
 
 // Get cars by dealer ID and minimum year
-app.get('/carsbyyear/:id/:year', async (req, res) => {
+app.get('/carsbyyear/:id/:year', getLimiter, async (req, res) => {
     try {
         const documents = await Cars.find({ dealer_id: req.params.id, year: { $gte: req.params.year } });
         res.json(documents);

@@ -7,6 +7,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const app = express();
 const port = 3030;
 
@@ -21,6 +22,26 @@ app.use(require('body-parser').urlencoded({ extended: false }));
 //     }
 //     next(); // Pass control to the next middleware or route handler
 // });
+
+// Rate limiting middleware
+const editLimiter = rateLimit({
+    windowMs: 30 * 1000, // 30 second window
+    max: 15, // Limit each IP to 15 requests per windowMs
+    message: { error: "Too many requests, please try again later" },
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+
+// Rate limiting middleware
+const getLimiter = rateLimit({
+    windowMs: 30 * 1000, // 30 second window
+    max: 30, // Limit each IP to 30 requests per windowMs
+    message: { error: "Too many requests, please try again later" },
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
 
 // Load sample data from JSON files
 try {
@@ -67,12 +88,12 @@ startServer();
 
 // Routes
 // Basic route to home
-app.get('/', async (req, res) => {
+app.get('/', getLimiter, async (req, res) => {
     res.send("Welcome to the Mongoose API");
 });
 
 // Fetch all reviews
-app.get('/fetchReviews', async (req, res) => {
+app.get('/fetchReviews', getLimiter, async (req, res) => {
     try {
         const documents = await Reviews.find();
         res.json(documents);
@@ -82,7 +103,7 @@ app.get('/fetchReviews', async (req, res) => {
 });
 
 // Fetch reviews for a particular dealership (by dealership ID)
-app.get('/fetchReviews/dealer/:id', async (req, res) => {
+app.get('/fetchReviews/dealer/:id', getLimiter, async (req, res) => {
     try {
         const documents = await Reviews.find({ dealership: req.params.id });
         res.json(documents);
@@ -92,7 +113,7 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
 });
 
 // Fetch review by it's id
-app.get('/fetchReviews/:id', async (req, res) => {
+app.get('/fetchReviews/:id', getLimiter, async (req, res) => {
     try {
         const documents = await Reviews.find({ id: req.params.id });
         res.json(documents);
@@ -102,7 +123,7 @@ app.get('/fetchReviews/:id', async (req, res) => {
 });
 
 // Fetch all dealerships
-app.get('/fetchDealers', async (req, res) => {
+app.get('/fetchDealers', getLimiter, async (req, res) => {
     try {
         const documents = await Dealerships.find();
         res.json(documents);
@@ -112,7 +133,7 @@ app.get('/fetchDealers', async (req, res) => {
 });
 
 // Fetch dealerships by state
-app.get('/fetchDealers/:state', async (req, res) => {
+app.get('/fetchDealers/:state', getLimiter, async (req, res) => {
     try {
         const documents = await Dealerships.find({ state: req.params.state });
         res.json(documents);
@@ -122,7 +143,7 @@ app.get('/fetchDealers/:state', async (req, res) => {
 });
 
 // Fetch dealership by ID
-app.get('/fetchDealer/:id', async (req, res) => {
+app.get('/fetchDealer/:id', getLimiter, async (req, res) => {
     try {
         const documents = await Dealerships.find({ id: req.params.id });
         res.json(documents);
@@ -132,7 +153,7 @@ app.get('/fetchDealer/:id', async (req, res) => {
 });
 
 // Update dealer by id
-app.put('/update_dealer/:id', express.json(), async (req, res) => {
+app.put('/update_dealer/:id', editLimiter, express.json(), async (req, res) => {
     try {
         const updatedDealer = await Dealerships.updateOne(
             { id: req.params.id },
@@ -150,7 +171,7 @@ app.put('/update_dealer/:id', express.json(), async (req, res) => {
 });
 
 // Update dealer by id
-app.post('/new_dealer/', express.json(), async (req, res) => {
+app.post('/new_dealer/', express.json(), editLimiter, async (req, res) => {
     try {
         const { full_name, address, city, zip, state, lat, long, short_name } = req.body;
         if (!full_name || !address || !city || !zip || !state || !lat || !long || !short_name) {
@@ -185,7 +206,7 @@ app.post('/new_dealer/', express.json(), async (req, res) => {
 });
 
 // Insert a new review (via POST request)
-app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
+app.post('/insert_review', express.raw({ type: '*/*' }), editLimiter, async (req, res) => {
     data = JSON.parse(req.body);
     const documents = await Reviews.find().sort({ id: -1 });
     const new_id = documents.length > 0 ? documents[0].id + 1 : 1;
@@ -213,7 +234,7 @@ app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
 });
 
 // Edit a review (via POST request)
-app.put('/edit_review/:id', express.json(), async (req, res) => {
+app.put('/edit_review/:id', express.json(), editLimiter, async (req, res) => {
     try {
         const review = await Reviews.findOne({ id: req.params.id });
 
@@ -224,6 +245,28 @@ app.put('/edit_review/:id', express.json(), async (req, res) => {
         if (review.username !== req.body.username) {
             return res.status(403).json({ error: 'Forbidden: You do not have permission to edit this review' });
         }
+
+        // // Define a validation schema
+        // const schema = Joi.object({
+        //     name: Joi.string().max(255),
+        //     username: Joi.string().max(255),
+        //     dealership: Joi.number(),
+        //     review: Joi.string(),
+        //     purchase: Joi.boolean(),
+        //     rating: Joi.number().min(1).max(5),
+        //     purchase_date: Joi.string(),
+        //     car_make: Joi.string().max(255),
+        //     car_model: Joi.string().max(255),
+        //     car_year: Joi.number().max(5000)
+        // });
+
+        // // Validate req.body
+        // const { error, value } = schema.validate(req.body);
+
+        // if (error) {
+        //     return res.status(400).json({ message: error.details[0].message });
+        // }
+
         const updatedReview = await Reviews.updateOne(
             { id: req.params.id },
             { $set: req.body }
