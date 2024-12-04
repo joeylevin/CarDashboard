@@ -20,7 +20,7 @@ const PostReview = () => {
         date: "",
     });    
     const [carmodels, setCarmodels] = useState([]);
-    const { currUser } = useContext(UserContext);
+    const { currUser, csrftoken } = useContext(UserContext);
     const [originalReview, setOriginalReview] = useState({});
     const navigate = useNavigate();
     const location = useLocation();
@@ -125,7 +125,7 @@ const PostReview = () => {
         try {
             const res = await fetch(url, {
                 method,
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", 'X-CSRFToken': csrftoken, },
                 body: JSON.stringify(updatedData)
             });
             if (!res.ok) throw new Error("Network response was not ok");
