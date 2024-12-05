@@ -15,7 +15,8 @@ const CarList = () => {
     const [cars, setCars] = useState([]); // Stores the list of cars
     const [makes, setMakes] = useState([]); // Stores car makes for the filter
     const [models, setModels] = useState([]); // Stores car models for the filter
-    const { dealers } = useContext(DealerContext); // Context for dealer data
+    const [modelList, setModelList] = useState([]); // Stores car models for the filter
+    const { dealers, error, loading } = useContext(DealerContext); // Context for dealer data
     const [message, setMessage] = useState("Loading Cars...."); // Message displayed when loading cars
     const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
     const [totalPages, setTotalPages] = useState(1); // Total number of pages for pagination
@@ -31,6 +32,7 @@ const CarList = () => {
     const [resetSlider, setResetSlider] = useState(false); // State for resetting the slider
 
     const dealer_url = `/djangoapp/full_inventory`; // URL endpoint for fetching car data
+    const make_model_url = `/djangoapp/makes_models`
 
     // Function to fetch car data based on current filters and pagination
     const fetchCars = async (page = 1) => {
@@ -60,13 +62,11 @@ const CarList = () => {
                     setMessage("No cars found."); // Show message if no cars are found
                     setCurrentPage(1); // Reset current page to 1
                     setTotalPages(1); // Reset total pages
-                    setMakes([]); // Clear makes if no cars are provided
-                    setModels([]); // Clear models if no cars are provided
                 } else {
+                    setMessage("");
                     setCars(retobj.cars); // Set the cars
                     setTotalPages(retobj.totalPages); // Set total pages from the API response
                     setCurrentPage(retobj.currentPage); // Set the current page from the API response
-                    populateMakesAndModels(retobj.cars); // Populate makes and models based on the fetched cars
                 }
             }
             else {
@@ -92,17 +92,37 @@ const CarList = () => {
     };
 
     // Function to extract makes and models from the fetched cars and set them for filtering
-    const populateMakesAndModels = (cars) => {
-        const tmpMakes = new Set(cars.map(car => car.make));
-        const tmpModels = new Set(cars.map(car => car.model));
-        setMakes([...tmpMakes]);
-        setModels([...tmpModels]);
+    const populateMakesAndModels = async () => {
+        try {
+            const res = await fetch(make_model_url, {
+                method: "GET"
+            });
+            const retobj = await res.json();
+
+            if (retobj.status === 200) {
+                console.log("data", retobj)
+                const data = retobj.makes_models;
+                const carMakes = data.map(item => item.make);
+                setMakes(carMakes);
+                setModelList(data);
+            }
+        } catch (err) {
+            console.error("Failed to fetch makes and models:", err);
+        }
     }
 
     // Function to get the location of a dealer based on dealer ID
     let carLocation = (dealerID) => {
-        const cur = dealers[dealerID];
-        return cur.city+', '+cur.state+' '+cur.zip
+        if (loading) {
+            return 'Loading Dealer information'
+        }
+        else if (error) {
+            return 'Error accessing Dealer information'
+        }
+        else {
+            const cur = dealers[dealerID];
+            return `${cur.city ?? ''}, ${cur.state ?? ''} ${cur.zip ?? ''}`.trim();
+        }   
     }
 
     // Function to check if any filters have changed from their default values
@@ -143,6 +163,20 @@ const CarList = () => {
         }));
     };
 
+    // Handle changes to the make of cars
+    const handleMakeChange = (e) => {
+        const { value } = e.target;
+        const selectedMakeData = modelList.find(item => item.make === value);
+        if (selectedMakeData) {
+            setModels(selectedMakeData.models); // Update models based on selected make
+        }
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            make: value,
+            model: 'all'
+        }));
+    }
+
     // Function to handle changes in range sliders (mileage and price)
     const handleRangeChange = (newValues, type) => {
         setFilters(prevFilters => ({
@@ -156,6 +190,12 @@ const CarList = () => {
         fetchCars(currentPage);
     }, [filters, currentPage]);
 
+    // Populate makes and models when starting
+    useEffect(() => {
+        populateMakesAndModels();
+    }, []);
+
+
     return (
         <div>
             <h1 className="search-cars-title">Full car list</h1>
@@ -163,7 +203,7 @@ const CarList = () => {
                 <div className="filters-container">
                     {/* Make filter */}
                     <label className="filter-label">Make</label>
-                    <select className="filter-select" id="make" value={filters.make} onChange={handleFilterChange}>
+                    <select className="filter-select" id="make" value={filters.make} onChange={handleMakeChange}>
                         {makes.length === 0 ? (
                             <option value=''>No data found</option>
                         ) : (
@@ -182,7 +222,7 @@ const CarList = () => {
                     <label className="filter-label">Model</label>
                     <select className="filter-select" id="model" value={filters.model} onChange={handleFilterChange}>
                         {models.length === 0 ? (
-                            <option value=''>No data found</option>
+                            <option value=''>No Make Selected</option>
                         ) : (
                             <>
                                 <option value='all'> -- All -- </option>
@@ -234,7 +274,7 @@ const CarList = () => {
 
             {/* Display Cars */}
             <div className="cars-list-container" >
-                {cars.length === 0 ? (
+                {message ? (
                     <p className="loading-message">{message}</p>
                 ) : (
                     <div>
