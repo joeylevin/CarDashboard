@@ -331,7 +331,7 @@ def chat_view(request):
 
         except openai.OpenAIError as e:
             print("Error in OpenAI", e)
-            return JsonResponse({"status": 500, 
+            return JsonResponse({"status": 500,
                                  "error": "An internal error has occurred!"})
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
