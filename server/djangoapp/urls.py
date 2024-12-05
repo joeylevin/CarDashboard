@@ -33,5 +33,7 @@ urlpatterns = [
          name='get_inventory'),
     path(route='full_inventory', view=views.full_inventory,
          name='full_inventory'),
+    path(route='makes_models', view=views.makes_models,
+         name='makes_models'),
     path(route='chat/', view=views.chat_view, name='chat'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

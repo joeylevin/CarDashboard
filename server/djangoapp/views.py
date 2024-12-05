@@ -331,3 +331,16 @@ def chat_view(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+def makes_models(request):
+    if request.method == 'GET':
+        endpoint = "/makes_models/"
+        try:
+            res = searchcars_request(endpoint)
+            return JsonResponse({"status": 200, "makes_models": res})
+        except Exception as e:
+            return JsonResponse({"status": 500, "error": str(e)})
+    else:
+        print("method not allowed")
+        return JsonResponse({"message": "Method Not Allowed"}, status=405)
