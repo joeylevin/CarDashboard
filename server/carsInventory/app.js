@@ -117,6 +117,34 @@ app.get('/inventory/', getLimiter, async (req, res) => {
     }
 });
 
+// Get the list of makes, with the corresponding models
+app.get('/makes_models/', getLimiter, async (req, res) => {
+    console.log('makes')
+    try {
+        const makesModels = await Cars.aggregate([
+            {
+                $group: {
+                    _id: "$make",
+                    models: { $addToSet: "$model" }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,          // Exclude _id from output
+                    make: "$_id",    // Rename _id to make
+                    models: 1        // Include models
+                }
+            }
+        ]);
+        console.log(makesModels)
+
+        res.status(200).json(makesModels);
+    } catch (error) {
+        console.error("Error fetching makes and models:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
 // Get cars by dealer ID
 app.get('/cars/:id', getLimiter, async (req, res) => {
     try {
