@@ -296,7 +296,9 @@ def full_inventory(request):
                              "currentPage": cars['currentPage'],
                              "totalPages": cars['totalPages']})
     except Exception as e:
-        return JsonResponse({"status": 500, "error": str(e)})
+        print("error getting full inventory", e)
+        return JsonResponse({"status": 500,
+                             "error": "An internal error has occurred!"})
 
 
 def chat_view(request):
@@ -328,7 +330,9 @@ def chat_view(request):
             return JsonResponse({"response": chat_gpt_message})
 
         except openai.OpenAIError as e:
-            return JsonResponse({"error": str(e)}, status=500)
+            print("Error in OpenAI", e)
+            return JsonResponse({"status": 500, 
+                                 "error": "An internal error has occurred!"})
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
@@ -340,7 +344,9 @@ def makes_models(request):
             res = searchcars_request(endpoint)
             return JsonResponse({"status": 200, "makes_models": res})
         except Exception as e:
-            return JsonResponse({"status": 500, "error": str(e)})
+            print("error getting makes/models", e)
+            return JsonResponse({"status": 500,
+                                 "error": "An internal error has occurred!"})
     else:
         print("method not allowed")
         return JsonResponse({"message": "Method Not Allowed"}, status=405)
