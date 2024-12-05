@@ -119,7 +119,6 @@ app.get('/inventory/', getLimiter, async (req, res) => {
 
 // Get the list of makes, with the corresponding models
 app.get('/makes_models/', getLimiter, async (req, res) => {
-    console.log('makes')
     try {
         const makesModels = await Cars.aggregate([
             {
@@ -136,7 +135,6 @@ app.get('/makes_models/', getLimiter, async (req, res) => {
                 }
             }
         ]);
-        console.log(makesModels)
 
         res.status(200).json(makesModels);
     } catch (error) {
